@@ -66,7 +66,6 @@ class Dashboard extends React.Component {
   _route = path => (window.location.href = path);
 
   render() {
-    console.log(this.props);
     const { location, match } = this.props;
     const section = location.pathname.split("dashboard/")[1];
     return (
