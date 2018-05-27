@@ -17,14 +17,15 @@ class Task extends React.Component {
     super(props);
   }
   render() {
+    const { match } = this.props;
     return (
       <Container>
         <Router>
           <Switch>
-            <Route path="/" component={Browse} />
-            <Route path="create" component={Create} />
-            <Route path="/ongoing" component={Ongoing} />
-            <Route path="/history" component={History} />
+            <Route exact path={match.url} component={Browse} />
+            <Route path={`${match.url}/create`} component={Create} />
+            <Route path={`${match.url}/ongoin`} component={Ongoing} />
+            <Route path={`${match.url}/history`} component={History} />
           </Switch>
         </Router>
       </Container>

@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import ProgressBar from "./ProgressBar";
 import TaskSummary from "./TaskSummary";
+import getWeb3 from "../../../../utils/getWeb3";
+import ipfs from "../../../../utils/ipfs";
 
 const Container = styled.section`
   background-color: #fff;
@@ -141,26 +143,14 @@ class Form extends React.Component {
       endDate,
       spec
     };
-    // event.preventDefault();
-    // const buffer = Buffer.from(JSON.stringify(this.state), "utf8"); // text string to Buffer
+    const buffer = Buffer.from(JSON.stringify(payload), "utf8"); // text string to Buffer
 
-    // const contractAddress = await contract.options.address;
-    // this.setState({ contractAddress: contractAddress });
-
-    // const accounts = await web3.eth.getAccounts();
-    // console.log("Sending from Metamask account: " + accounts[0]);
-
-    // await ipfs.add(buffer, (err, ipfsHash) => {
-    //   console.log(err, ipfsHash);
-    //   // setState by setting ipfsHash to ipfsHash[0].hash
-    //   this.setState({ ipfsHash: ipfsHash[0].hash });
-
-    //   contract.methods
-    //     .setHash(this.state.ipfsHash)
-    //     .send({ from: accounts[0] }, (error, transactionHash) => {
-    //       console.log(transactionHash);
-    //     }); // setHash
-    // });
+    await ipfs.add(buffer, (err, ipfsHash) => {
+      // setState by setting ipfsHash to ipfsHash[0].hash
+      this.setState({ ipfsHash: ipfsHash[0].hash });
+      const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
+      // TODO add to contract
+    });
   };
   render() {
     const { currentProgress } = this.state;

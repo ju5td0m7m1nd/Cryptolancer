@@ -75,7 +75,7 @@ class Dashboard extends React.Component {
           <SidePanel>
             <SidePanelLink
               onClick={() => this._route("/dashboard/")}
-              activate={section === ""}
+              activate={section.indexOf("task") > -1}
               borderColor="#F17105"
             >
               <LinkIcon src="/images/icons/task.svg" />
@@ -109,7 +109,7 @@ class Dashboard extends React.Component {
           <Content>
             <Router>
               <Switch>
-                <Route exact path={match.url} component={Task} />
+                <Route path={`${match.url}/task`} component={Task} />
                 <Route path={`${match.url}/court`} component={Court} />
                 <Route path={`${match.url}/wallet`} component={Wallet} />
                 <Route path={`${match.url}/settings`} component={Settings} />
