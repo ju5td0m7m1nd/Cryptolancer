@@ -3,9 +3,8 @@ import styled from "styled-components";
 
 const Container = styled.nav`
   width: 100%;
-  height: 15%;
   padding: 8px 24px;
-  background-color: #4894fc;
+  background-color: #6610f2;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -16,6 +15,10 @@ const Container = styled.nav`
   }
 `;
 
+const Logo = styled.img`
+  height: 48px;
+`;
+
 class Nav extends React.Component {
   constructor(props) {
     super(props);
@@ -23,7 +26,7 @@ class Nav extends React.Component {
   render() {
     return (
       <Container>
-        <h1>Cryptolancer</h1>
+        <Logo src="/images/icons/logo.png" />
       </Container>
     );
   }

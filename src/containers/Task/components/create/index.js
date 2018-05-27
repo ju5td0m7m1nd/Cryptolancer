@@ -122,7 +122,7 @@ class Form extends React.Component {
       ]
     });
 
-  _submit = () => {
+  _submit = async () => {
     const {
       name,
       requiredSkills,
@@ -141,6 +141,26 @@ class Form extends React.Component {
       endDate,
       spec
     };
+    // event.preventDefault();
+    // const buffer = Buffer.from(JSON.stringify(this.state), "utf8"); // text string to Buffer
+
+    // const contractAddress = await contract.options.address;
+    // this.setState({ contractAddress: contractAddress });
+
+    // const accounts = await web3.eth.getAccounts();
+    // console.log("Sending from Metamask account: " + accounts[0]);
+
+    // await ipfs.add(buffer, (err, ipfsHash) => {
+    //   console.log(err, ipfsHash);
+    //   // setState by setting ipfsHash to ipfsHash[0].hash
+    //   this.setState({ ipfsHash: ipfsHash[0].hash });
+
+    //   contract.methods
+    //     .setHash(this.state.ipfsHash)
+    //     .send({ from: accounts[0] }, (error, transactionHash) => {
+    //       console.log(transactionHash);
+    //     }); // setHash
+    // });
   };
   render() {
     const { currentProgress } = this.state;

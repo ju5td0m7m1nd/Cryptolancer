@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Form from "./Form";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -8,19 +8,13 @@ const Container = styled.div`
   background-color: #fff;
 `;
 
-const Title = styled.h2`color: #4894fc;`;
-
-class CreateTask extends React.Component {
+class Wallet extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    return (
-      <Container>
-        <Form />
-      </Container>
-    );
+    return <Container>Wallet</Container>;
   }
 }
 
-export default CreateTask;
+export default Wallet;
