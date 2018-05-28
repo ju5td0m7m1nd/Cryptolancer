@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "../build/contracts/SimpleStorage.json";
 import getWeb3 from "./utils/getWeb3";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  withRouter
+} from "react-router-dom";
 import Dashboard from "./containers/Dashboard";
 import "./css/oswald.css";
 import "./css/open-sans.css";

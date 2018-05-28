@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
+import { withRouter } from "react-router-dom";
 class History extends React.Component {
   constructor(props) {
     super(props);
@@ -10,4 +10,4 @@ class History extends React.Component {
   }
 }
 
-export default History;
+export default withRouter(History);
