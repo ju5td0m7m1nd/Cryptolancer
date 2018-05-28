@@ -53,6 +53,7 @@ const Main = styled.main`
 
 const Content = styled.div`
   width: 85%;
+  padding-top: 5%;
   height: 100%;
 `;
 
@@ -109,7 +110,7 @@ class Dashboard extends React.Component {
           <Content>
             <Router>
               <Switch>
-                <Route path={`${match.url}/task`} component={Task} />
+                <Route path={`${match.url}/task/:section`} component={Task} />
                 <Route path={`${match.url}/court`} component={Court} />
                 <Route path={`${match.url}/wallet`} component={Wallet} />
                 <Route path={`${match.url}/settings`} component={Settings} />
