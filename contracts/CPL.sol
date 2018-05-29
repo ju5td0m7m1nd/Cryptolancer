@@ -62,7 +62,16 @@ contract CPL {
 	    }
 	    return(i);
 	}
-	function updateContract(bytes32 _name , address _beneficiary)public{
+	// if you want to update contract, you should set toke first
+	function updateContract(bytes32 Pro_name, bytes new_ipfs)public{
+	    require(contractOwner == msg.sender);
+	    uint i = get_pro(Pro_name);
+	    require(Contracts[contractOwner][i].state == 1);//launch
+		Contracts[contractOwner][i].ipfs = new_ipfs;
+	    
+	}
+	
+	function receive_contract(bytes32 _name , address _beneficiary)public{
 	    require(beneficiary == _beneficiary);
 	    require(contractOwner == msg.sender);
 	    uint i = get_pro(_name);
