@@ -1,7 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 import Nav from "./components/Nav";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  withRouter
+} from "react-router-dom";
 import Task from "../Task";
 import Court from "../Court";
 import Wallet from "../Wallet";
@@ -9,12 +15,12 @@ import Settings from "../Settings";
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background-color: #f9f9f9;
 `;
 
 const SidePanel = styled.div`
-  width: 15%;
+  width: 20%;
   height: 100%;
   padding: 5% 0px;
 `;
@@ -47,12 +53,13 @@ const Main = styled.main`
   width: 100%;
   height: 85%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 `;
 
 const Content = styled.div`
-  width: 85%;
+  width: 80%;
+  padding-top: 5%;
   height: 100%;
 `;
 
@@ -68,13 +75,14 @@ class Dashboard extends React.Component {
   render() {
     const { location, match } = this.props;
     const section = location.pathname.split("dashboard/")[1];
+
     return (
       <Container>
         <Nav />
         <Main>
           <SidePanel>
             <SidePanelLink
-              onClick={() => this._route("/dashboard/")}
+              onClick={() => this._route("/dashboard/task/browse")}
               activate={section.indexOf("task") > -1}
               borderColor="#F17105"
             >
@@ -107,14 +115,12 @@ class Dashboard extends React.Component {
             </SidePanelLink>
           </SidePanel>
           <Content>
-            <Router>
-              <Switch>
-                <Route path={`${match.url}/task`} component={Task} />
-                <Route path={`${match.url}/court`} component={Court} />
-                <Route path={`${match.url}/wallet`} component={Wallet} />
-                <Route path={`${match.url}/settings`} component={Settings} />
-              </Switch>
-            </Router>
+            <Switch>
+              <Route path={`${match.url}/task/:section`} component={Task} />
+              <Route path={`${match.url}/court`} component={Court} />
+              <Route path={`${match.url}/wallet`} component={Wallet} />
+              <Route path={`${match.url}/settings`} component={Settings} />
+            </Switch>
           </Content>
         </Main>
       </Container>
@@ -122,4 +128,4 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard;
+export default withRouter(Dashboard);
