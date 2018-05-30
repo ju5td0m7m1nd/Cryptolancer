@@ -183,7 +183,7 @@ class Form extends React.Component {
                       />}
                 </InputRow>
               )}
-              <NextBtn onClick={this._nextStep}>Next ></NextBtn>
+              <NextBtn onClick={this._nextStep}> Next > </NextBtn>
             </Wrapper>
           : <Wrapper>
               <TaskSummary {...this.state} />
