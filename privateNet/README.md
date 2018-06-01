@@ -28,29 +28,7 @@
 
 * Step 2: Initialize the private blockchain with the genesis block
     - Create genesis block file (`genesis.json`)
-    ```json
-    {
-        "config": {
-          "chainId": 3345678,
-          "homesteadBlock": 0,
-          "eip155Block": 0,
-          "eip158Block": 0,
-          "byzantiumBlock": 0
-        },
-        "nonce": "0x0000000000000042",
-        "timestamp": "0x00",
-        "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "extraData": "0x00",
-        "gasLimit": "0x8000000",
-        "difficulty": "0x400",
-        "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "coinbase": "0x3333333333333333333333333333333333333333",
-        "alloc": {
-            "37164024c99345142820ca03b78af21e01b0ffcb":
-            { "balance": "20000000000000000000" }
-        }
-    }
-    ```
+    ![](pics/genesis.png)
 
     - Config:
         - **chainId**: this is your chain identifier, and it is used in replay protection
