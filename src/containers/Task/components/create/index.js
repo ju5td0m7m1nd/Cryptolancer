@@ -6,26 +6,54 @@ import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
 
 const Container = styled.section`
-  background-color: #fff;
-  border-top: solid 1px #707070;
-  width: 80%;
+  background-color: #f9f9f9;
+  width: 100%;
   height: 80%;
-  margin-top: 24px;
-  padding: 32px;
+  padding: 10px;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
 `;
 
 const Wrapper = styled.div`
-  width: 80%;
+background-color: #fff;
+  width: 90%;
   display: flex;
   justify-content: flex-start;
   align-items: flex-end;
   flex-direction: column;
   height: 80%;
   position: relative;
+  border-radius: 12px;
+  padding: 40px;
+  border: solid 1px #707070;
 `;
+
+const Head = styled.h3`
+  font-size: 50px;
+  font-weight: 800;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #f17105;
+  width: 100%;
+  margin-bottom: 40px;
+`;
+
+const Body = styled.h3`
+  font-size: 30px;
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: left;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+`;
+
 
 const InputRow = styled.div`
   width: 100%;
@@ -37,18 +65,19 @@ const InputRow = styled.div`
 `;
 
 const Label = styled.h3`
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
   text-align: left;
-  color: #4894fc;
-  width: 30%;
+  color: black;
+  width: 50%;
 `;
 
+
 const Input = styled.input`
-  font-size: 16px;
+  font-size: 20px;
   font-weight: lighter;
   text-align: left;
   color: #4894fc;
@@ -59,42 +88,55 @@ const Input = styled.input`
   width: 60%;
 `;
 
-const NextBtn = styled.button`
-  outline: none;
-  color: #4894fc;
-  border: 0px;
-  background-color: transparent;
-  position: absolute;
-  bottom: 0;
+const Btn = styled.button`
+  width: 40%;
+  height: 60px;
+  color: white;
+  background-color: #6610f2;
+  border-radius: 20px;
+  font-size: 20px;
+  float:right;
+  margin-top: 20px;
 `;
 
 const Textarea = styled.textarea`
   width: 100%;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: lighter;
   text-align: left;
   color: #4894fc;
-  padding: 8px;
+  margin-top: 20px;
   background-color: transparent;
   border: 0px;
   outline: none;
 `;
 
+const Block = styled.div`
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background-color: #f9f9f9;
+  flex-direction: row;
+  align-items: flex-end;
+`;
+
 const PROGRESS = {
-  basicInfo: ["name", "requiredSkills", "budget", "description"],
+  basicInfo: ["title", "requiredSkills", "budget", "description"],
   timeline: ["startDate", "endDate"],
-  detailSpec: ["spec"],
+  taskrequirement: ["detailspec"],
   submit: []
 };
 
 const INPUT_NAME = {
-  name: "Name",
+  title: "Title",
   requiredSkills: "Required Skills",
   budget: "Budget",
   description: "Description",
-  startDate: "Start date",
-  endDate: "End date",
-  spec: "Spec"
+  startDate: "Start Date",
+  endDate: "End Date",
+  detailspec: "Detail specification"
 };
 
 class Form extends React.Component {
@@ -153,13 +195,13 @@ class Form extends React.Component {
     });
   };
   render() {
-    const { currentProgress } = this.state;
+    //const { currentProgress } = this.state;
     return (
       <Container>
-        <ProgressBar currentProgress={currentProgress} PROGRESS={PROGRESS} />
-        {Object.keys(PROGRESS).indexOf(currentProgress) < 3
-          ? <Wrapper>
-              {PROGRESS[currentProgress].map((item, key) =>
+          <Head>Create Task</Head>
+          <Body>Basic Info</Body>
+          <Wrapper>
+              {PROGRESS["basicInfo"].map((item, key) =>
                 <InputRow key={key}>
                   <Label>
                     {INPUT_NAME[item]}
@@ -180,15 +222,51 @@ class Form extends React.Component {
                             : item.indexOf("Date") > -1 ? "date" : "normal"
                         }
                         onChange={e => this._handleChange(e, item)}
-                      />}
+                      />
+                }</InputRow>
+              )}
+          </Wrapper>
+          <Body>Tineline</Body>
+          <Wrapper>
+              {PROGRESS["timeline"].map((item, key) =>
+                <InputRow key={key}>
+                  <Label>
+                    {INPUT_NAME[item]}
+                  </Label>
+                  <Input
+                    key={item}
+                    placeholder={INPUT_NAME[item]}
+                    defaultValue={this.state[item]}
+                    type="date"                                         
+                    onChange={e => this._handleChange(e, item)}
+                  />
                 </InputRow>
               )}
-              <NextBtn onClick={this._nextStep}> Next > </NextBtn>
-            </Wrapper>
-          : <Wrapper>
-              <TaskSummary {...this.state} />
-              <NextBtn onClick={this._submit}>Submit ></NextBtn>
-            </Wrapper>}
+          </Wrapper>
+          <Body>Task Requirement</Body>        
+          <Wrapper>
+              {PROGRESS["taskrequirement"].map((item, key) =>
+                <InputRow key={key}>
+                  <Label>
+                    {INPUT_NAME[item]}
+                  </Label>
+                  
+                  <Textarea
+                      innerRef={c => (this.spec = c)}
+                      onKeyUp={() => this._autoGrow(this.spec)}
+                      onChange={e => this._handleChange(e, item)}
+                  />
+                  
+                </InputRow>
+
+              )}
+              
+          </Wrapper>
+          <Block>
+            <Head></Head>
+            <Btn onClick={this._submit}>SUBMIT</Btn>
+          </Block>
+
       </Container>
     );
   }
