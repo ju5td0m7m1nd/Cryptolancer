@@ -149,6 +149,7 @@ class Form extends React.Component {
       // setState by setting ipfsHash to ipfsHash[0].hash
       this.setState({ ipfsHash: ipfsHash[0].hash });
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
+      alert(fileAddress);
       // TODO add to contract
     });
   };
