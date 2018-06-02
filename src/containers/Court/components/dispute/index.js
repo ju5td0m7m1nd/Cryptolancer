@@ -204,12 +204,6 @@ const Line = styled.hr `
     color: #707070;
 `;
 
-const PROGRESS = {
-  basicInfo: ["name", "requiredSkills", "budget", "description"],
-  timeline: ["startDate", "endDate"],
-  detailSpec: ["spec"],
-  submit: []
-};
 
 var IPFS_DATA = "";
 
@@ -217,31 +211,37 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     //read IPFS    
-    var ipfsPath="QmfR2Lz38ndu8qv6xXy7oSKC4GnKqN7oLFwyzY4z3Kzwdi"
-    //var ipfsPath="Qmck3Nd88HQyoEzpBFtpnft451vVPULDGS5GbGjge9sZe9"
+    var ipfsPath="QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU"
+    //var ipfsPath="QmfR2Lz38ndu8qv6xXy7oSKC4GnKqN7oLFwyzY4z3Kzwdi"
     this.state = {
+      ipfsData: "",
+      currentUser: "testUser",
       name: "<test> Convert website to android and iOS application",
       description: "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
       detailSpec: "<test> Put it onto App store and GooglePlay.",
       disputes: [""],
-      decisionAgree: [],
       disputeLength: 0,
+      submit: "unfinished"
     };
     var content = ""
-    var thisPtr = this;
+    var thisPtr = this; 
     ipfs.files.cat(ipfsPath, function(err, res) {
       if(!err){    
         IPFS_DATA = res.toString();  
         //load IPFS to web
         content = JSON.parse(IPFS_DATA);
+        for (var i=0; i<content.arguments.length; i++) {
+          content.arguments[i]["dec"] = "agree";
+        }
         thisPtr.setState({
+          ipfsData: content,
           name: content.name,
           description: content.requiredSkills,
           detailSpec: content.spec,
           disputes: content.arguments,
           disputeLength: content.arguments.length
         });
-
+        
       } else {
         alert("ipfs download error");
         console.error('cat error', res);
@@ -255,33 +255,73 @@ class Form extends React.Component {
   };
 
 
-  _handleOptionChange =  (e) => {
-    var newArray = this.state.decisionAgree.slice();    
-    newArray.push("specID");
-    this.setState({decisionAgree:newArray})
+  _handleOptionChange =  (e, dispute) => {
+    var newArray = this.state.disputes;
+    var specID = dispute.dispute.spec_ID;
+    for (var i=0; i<newArray.length; i++){
+      if (newArray[i]["spec_ID"] == specID) {
+        newArray[i]["dec"] = e.target.value;
+      }
+    }
+    //newArray.push("specID");
+    this.setState({disputes:newArray}, function(){ console.log(this.state.disputes) })
   };
 
   _handleChange = (e, type) => this.setState({ [type]: e.target.value });
 
   _submit = async () => {
+    //edit polling condition
+    var newArray = this.state.disputes;
+    console.log(this.state.disputes);
+    for (var i=0; i<this.state.disputes.length; i++){
+      if (this.state.disputes[i]["dec"] == "agree") {
+        if (newArray[i]["voteYes"] == null) {
+          newArray[i]["voteYes"] = new Array();
+        }else {
+          newArray[i]["voteYes"] = Array.from(newArray[i]["voteYes"]);
+        }
+        newArray[i]["voteYes"].push(this.state.currentUser);
+      }
+      else {
+        if (newArray[i]["voteNo"] == null) {
+          newArray[i]["voteNo"] = new Array();
+        }else {
+          newArray[i]["voteNo"] = Array.from(newArray[i]["voteNo"]);
+        }
+        newArray[i]["voteNo"].push(this.state.currentUser);
+      }
+    }
+    this.setState({
+      disputes:newArray,
+      submit: "finish"
+    }, function(){ console.log(this.state.disputes) })
+    
     //upload IPFS
-    //disable radio button
-    //
-    alert("submit!");
+
+    var content = this.state.ipfsData;
+    console.log("ipfsData arguments: ",this.state.ipfsData.arguments)
+    console.log("disputes: ", this.state.disputes)
+    content.arguments = this.state.disputes;
+
+    const buffer = Buffer.from(JSON.stringify(content), "utf8"); // text string to Buffer
+    await ipfs.add(buffer, (err, ipfsHash) => {
+      const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
+      // alert(fileAddress);
+      
+      
+      // TODO add to contract
+    });
   
   };
   render() {
-    // const { currentProgress } = this.state;
 
 
     return (
       <div>
       <Back2BrowseBtn> &lt; Back to Browse</Back2BrowseBtn>
       <Container>
-        
           <ProjectName> {this.state.name} </ProjectName>
           <Label> {this.state.description} </Label>
-        
       </Container>
 
       <Title>Task Requirement</Title>
@@ -320,14 +360,14 @@ class Form extends React.Component {
                 <JudgementBlock>
                   <Label>
                   <input type="radio" value="agree" 
-                      checked={dispute.selectOption === 'agree'} 
-                      onChange={this.handleOptionChange} />
+                      checked={dispute.dec === 'agree'} 
+                      onChange={e => this._handleOptionChange(e, {dispute})} />
                    Reasonable
                   </Label>
                   <Label>
                   <input type="radio" value="disagree" 
-                      checked={dispute.selectOption === 'disagree'} 
-                      onChange={this.handleOptionChange} />
+                      checked={dispute.dec === 'disagree'} 
+                      onChange={e => this._handleOptionChange(e, {dispute})} />
                    Not Convincible
                   </Label>
 
@@ -342,7 +382,7 @@ class Form extends React.Component {
       <Container>
         
       </Container>
-      <SubmitBtn onClick={this._submit}>Submit ></SubmitBtn>
+      <SubmitBtn onClick={this._submit} disabled={this.state.submit === "finish"}>Submit ></SubmitBtn>
       </div>
       
       
