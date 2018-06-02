@@ -44,6 +44,7 @@ const Block = styled.div`
   border: solid 1px #707070;
   border-left: solid 10px #f17105;
   flex-direction: row;
+  margin-top: 30px;
 `;
 
 
@@ -57,7 +58,7 @@ const Center = styled.div`
 `;
 
 const Head = styled.h3`
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -100,8 +101,10 @@ const Input = styled.input`
   background-color: transparent;
   border: 0px;
   outline: none;
-  width: 60%;
-  border-bottom: solid 1px #bababa;
+  width: 30%;
+  border-bottom: solid 2px #707070;
+  font-weight: 500;
+  font-style: italic;
 `;
 
 const CreatBtn = styled.button`
@@ -114,17 +117,23 @@ const CreatBtn = styled.button`
 `;
 
 const DetailBtn = styled.button`
-  width: 15%;
+  width: 25%;
   font-size: 20px;
   font-weight:bold;
   border: 0px;
   background-color: transparent;
   color: #f17105;
-
+  
   bottom: 0;
 `;
 
+const Price= styled.div`
+  width: 25%;
+  border: 0px;
+  background-color: transparent;
+  text-align: center;
 
+`;
 
 const PROGRESS = {
   basicInfo: ["name", "requiredSkills", "budget", "description"],
@@ -166,13 +175,14 @@ class Browse extends React.Component {
     		<Wrapper>
 				<InputRow>				
 					<Input                    
-	                    placeholder={"Search tasks"}                      
-	                    onChange={e => this._handleChange(e, "search")}
-	                />
-	                <CreatBtn>+Creare task</CreatBtn>
+            placeholder={"Search tasks"}                      
+            onChange={e => this._handleChange(e, "search")}
+          />
+	        <CreatBtn>+Creare task</CreatBtn>
 	                
 				</InputRow>
 				<Block>
+          <Price>250000</Price>
 					<Center>
 						<Head>Convert website to android and iOS application. </Head>
 						<Body>We use reactjs on website, so it will be easy to convert to app if you're familiar with React Native</Body>
