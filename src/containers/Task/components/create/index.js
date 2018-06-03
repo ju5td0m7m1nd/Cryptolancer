@@ -1,7 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import ProgressBar from "./ProgressBar";
-import TaskSummary from "./TaskSummary";
 import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
 
@@ -17,7 +15,7 @@ const Container = styled.section`
 `;
 
 const Wrapper = styled.div`
-background-color: #fff;
+  background-color: #fff;
   width: 90%;
   display: flex;
   justify-content: flex-start;
@@ -31,7 +29,7 @@ background-color: #fff;
 `;
 
 const Head = styled.h3`
-  font-size: 50px;
+  font-size: 2vmax;
   font-weight: 800;
   font-style: normal;
   font-stretch: normal;
@@ -39,11 +37,10 @@ const Head = styled.h3`
   text-align: left;
   color: #f17105;
   width: 100%;
-  margin-bottom: 40px;
 `;
 
 const Body = styled.h3`
-  font-size: 30px;
+  font-size: 1.5vmax;
   font-weight: 700;
   font-style: normal;
   font-stretch: normal;
@@ -53,7 +50,6 @@ const Body = styled.h3`
   margin-top: 20px;
   margin-bottom: 20px;
 `;
-
 
 const InputRow = styled.div`
   width: 100%;
@@ -65,7 +61,7 @@ const InputRow = styled.div`
 `;
 
 const Label = styled.h3`
-  font-size: 20px;
+  font-size: 1.2vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -75,12 +71,11 @@ const Label = styled.h3`
   width: 50%;
 `;
 
-
 const Input = styled.input`
-  font-size: 20px;
+  font-size: 1.2vmax;
   font-weight: lighter;
   text-align: left;
-  color: #4894fc;
+  color: #303030;
   padding: 8px;
   background-color: transparent;
   border: 0px;
@@ -89,22 +84,22 @@ const Input = styled.input`
 `;
 
 const Btn = styled.button`
-  width: 40%;
-  height: 60px;
+  padding: 12px 36px;
   color: white;
   background-color: #6610f2;
-  border-radius: 20px;
-  font-size: 20px;
-  float:right;
+  border-radius: 5px;
+  font-size: 1.5vmax;
+  float: right;
+  outline: none;
   margin-top: 20px;
 `;
 
 const Textarea = styled.textarea`
   width: 100%;
-  font-size: 20px;
+  font-size: 1.2vmax;
   font-weight: lighter;
   text-align: left;
-  color: #4894fc;
+  color: #303030;
   margin-top: 20px;
   background-color: transparent;
   border: 0px;
@@ -120,6 +115,18 @@ const Block = styled.div`
   background-color: #f9f9f9;
   flex-direction: row;
   align-items: flex-end;
+`;
+
+const BackBtn = styled.div`
+  font-size: 18px;
+  font-weight: 500;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #f17105;
+  margin-bottom: 32px;
+  cursor: pointer;
 `;
 
 const PROGRESS = {
@@ -149,7 +156,7 @@ class Form extends React.Component {
       description: "",
       startDate: "",
       endDate: "",
-      spec: "",
+      detailspec: "",
       owner: "",
       currentProgress: "basicInfo"
     };
@@ -174,7 +181,7 @@ class Form extends React.Component {
       defaultValue,
       startDate,
       endDate,
-      spec
+      detailspec
     } = this.state;
     const payload = {
       name,
@@ -183,7 +190,7 @@ class Form extends React.Component {
       defaultValue,
       startDate,
       endDate,
-      spec
+      detailspec
     };
     const buffer = Buffer.from(JSON.stringify(payload), "utf8"); // text string to Buffer
 
@@ -192,81 +199,83 @@ class Form extends React.Component {
       this.setState({ ipfsHash: ipfsHash[0].hash });
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
       // TODO add to contract
+      console.log(fileAddress);
     });
   };
   render() {
     //const { currentProgress } = this.state;
     return (
       <Container>
-          <Head>Create Task</Head>
-          <Body>Basic Info</Body>
-          <Wrapper>
-              {PROGRESS["basicInfo"].map((item, key) =>
-                <InputRow key={key}>
-                  <Label>
-                    {INPUT_NAME[item]}
-                  </Label>
-                  {item === "spec"
-                    ? <Textarea
-                        innerRef={c => (this.spec = c)}
-                        onKeyUp={() => this._autoGrow(this.spec)}
-                        onChange={e => this._handleChange(e, item)}
-                      />
-                    : <Input
-                        key={item}
-                        placeholder={INPUT_NAME[item]}
-                        defaultValue={this.state[item]}
-                        type={
-                          item === "budget"
-                            ? "number"
-                            : item.indexOf("Date") > -1 ? "date" : "normal"
-                        }
-                        onChange={e => this._handleChange(e, item)}
-                      />
-                }</InputRow>
-              )}
-          </Wrapper>
-          <Body>Tineline</Body>
-          <Wrapper>
-              {PROGRESS["timeline"].map((item, key) =>
-                <InputRow key={key}>
-                  <Label>
-                    {INPUT_NAME[item]}
-                  </Label>
-                  <Input
+        <BackBtn
+          onClick={() => this.props.history.push("/dashboard/task/browse")}
+        >
+          {"< Back to Browse"}
+        </BackBtn>
+        <Head>Create Task</Head>
+        <Body>Basic Info</Body>
+        <Wrapper>
+          {PROGRESS["basicInfo"].map((item, key) =>
+            <InputRow key={key}>
+              <Label>
+                {INPUT_NAME[item]}
+              </Label>
+              {item === "spec"
+                ? <Textarea
+                    innerRef={c => (this.spec = c)}
+                    onKeyUp={() => this._autoGrow(this.spec)}
+                    onChange={e => this._handleChange(e, item)}
+                  />
+                : <Input
                     key={item}
                     placeholder={INPUT_NAME[item]}
                     defaultValue={this.state[item]}
-                    type="date"                                         
+                    type={
+                      item === "budget"
+                        ? "number"
+                        : item.indexOf("Date") > -1 ? "date" : "normal"
+                    }
                     onChange={e => this._handleChange(e, item)}
-                  />
-                </InputRow>
-              )}
-          </Wrapper>
-          <Body>Task Requirement</Body>        
-          <Wrapper>
-              {PROGRESS["taskrequirement"].map((item, key) =>
-                <InputRow key={key}>
-                  <Label>
-                    {INPUT_NAME[item]}
-                  </Label>
-                  
-                  <Textarea
-                      innerRef={c => (this.spec = c)}
-                      onKeyUp={() => this._autoGrow(this.spec)}
-                      onChange={e => this._handleChange(e, item)}
-                  />
-                  
-                </InputRow>
+                  />}
+            </InputRow>
+          )}
+        </Wrapper>
+        <Body>Tineline</Body>
+        <Wrapper>
+          {PROGRESS["timeline"].map((item, key) =>
+            <InputRow key={key}>
+              <Label>
+                {INPUT_NAME[item]}
+              </Label>
+              <Input
+                key={item}
+                placeholder={INPUT_NAME[item]}
+                defaultValue={this.state[item]}
+                type="date"
+                onChange={e => this._handleChange(e, item)}
+              />
+            </InputRow>
+          )}
+        </Wrapper>
+        <Body>Task Requirement</Body>
+        <Wrapper>
+          {PROGRESS["taskrequirement"].map((item, key) =>
+            <InputRow key={key} style={{ display: "block" }}>
+              <Label>
+                {INPUT_NAME[item]}
+              </Label>
 
-              )}
-              
-          </Wrapper>
-          <Block>
-            <Head></Head>
-            <Btn onClick={this._submit}>SUBMIT</Btn>
-          </Block>
-
+              <Textarea
+                innerRef={c => (this.spec = c)}
+                onKeyUp={() => this._autoGrow(this.spec)}
+                onChange={e => this._handleChange(e, item)}
+              />
+            </InputRow>
+          )}
+        </Wrapper>
+        <Block>
+          <Head />
+          <Btn onClick={this._submit}>SUBMIT</Btn>
+        </Block>
       </Container>
     );
   }

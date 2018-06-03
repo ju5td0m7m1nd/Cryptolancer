@@ -31,10 +31,14 @@ class Task extends React.Component {
   render() {
     const { match } = this.props;
     const { section } = this.props.match.params;
-
+    const { pathname } = this.props.location;
+    const hideNavBar = pathname.indexOf("create") > -1;
     return (
       <Container>
-        <Navbar section={section} color="#f17105" route={this._route} />
+        {hideNavBar
+          ? null
+          : <Navbar section={section} color="#f17105" route={this._route} />}
+
         <Switch>
           <Route exact path={`/dashboard/task/browse`} component={Browse} />
           <Route path={`/dashboard/task/create`} component={Create} />
