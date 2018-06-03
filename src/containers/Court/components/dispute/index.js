@@ -7,8 +7,6 @@ import ipfs from "../../../../utils/ipfs";
 const Container = styled.section`
   background-color: transparent;
   width: 80%;
-  margin-top: 24px;
-  padding: 32px;
 `;
 
 const Block = styled.div`
@@ -139,12 +137,14 @@ const RadioBtn = styled.button`
 `;
 
 const SubmitBtn = styled.button`
-  outline: none;
-  font-size: 20px;
-  color: #d11149;
-  border: 0px;
-  background-color: transparent;
+  padding: 12px 36px;
+  color: white;
+  background-color: #d11149;
+  border-radius: 5px;
+  font-size: 1.2vmax;
   float: right;
+  outline: none;
+  border: 0px;
   margin: 24px 0px;
 `;
 
@@ -174,9 +174,6 @@ var IPFS_DATA = "";
 class Form extends React.Component {
   constructor(props) {
     super(props);
-    //read IPFS
-    var ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
-    //var ipfsPath="QmfR2Lz38ndu8qv6xXy7oSKC4GnKqN7oLFwyzY4z3Kzwdi"
     this.state = {
       ipfsData: "",
       currentUser: "testUser",
@@ -188,8 +185,16 @@ class Form extends React.Component {
       disputeLength: 0,
       submit: "unfinished"
     };
-    var content = "";
-    var thisPtr = this;
+  }
+
+  componentDidMount() {
+    this._initData();
+  }
+
+  _initData = () => {
+    let content = "";
+    let thisPtr = this;
+    const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
         IPFS_DATA = res.toString();
@@ -211,7 +216,8 @@ class Form extends React.Component {
         console.error("cat error", res);
       }
     });
-  }
+  };
+
   _autoGrow = e => {
     e.style.height = "10px";
     e.style.height = e.scrollHeight + 20 + "px";
@@ -282,7 +288,11 @@ class Form extends React.Component {
   render() {
     return (
       <Container>
-        <Back2BrowseBtn> &lt; Back to Browse</Back2BrowseBtn>
+        <Back2BrowseBtn
+          onClick={() => this.props.history.push("/dashboard/court/browse")}
+        >
+          {" "}&lt; Back to Browse
+        </Back2BrowseBtn>
         <Block>
           <ProjectName>
             {" "}{this.state.name}{" "}
@@ -362,7 +372,7 @@ class Form extends React.Component {
           onClick={this._submit}
           disabled={this.state.submit === "finish"}
         >
-          Submit >
+          Apply
         </SubmitBtn>
       </Container>
     );

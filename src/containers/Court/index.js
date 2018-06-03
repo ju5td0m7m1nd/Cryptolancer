@@ -1,10 +1,17 @@
 import React from "react";
 import styled from "styled-components";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  withRouter
+} from "react-router-dom";
 import Browse from "./components/browse";
 import Ongoing from "./components/ongoing";
 import History from "./components/history";
 import Dispute from "./components/dispute";
+import NavBar from "./components/NavBar";
 
 const Container = styled.div`
   width: 100%;
@@ -15,17 +22,19 @@ class Court extends React.Component {
   constructor(props) {
     super(props);
   }
+  _route = path => this.props.history.push(path);
   render() {
+    const { section } = this.props.match.params;
     return (
       <Container>
-        <Router>
-          <Switch>
-            <Route path={`/dashboard/court/dispute`} component={Dispute} />
-          </Switch>
-        </Router>
+        <NavBar section={section} color="#D11149" route={this._route} />
+        <Switch>
+          <Route exact path={`/dashboard/court/browse`} component={Browse} />
+          <Route path={`/dashboard/court/browse/:id`} component={Dispute} />
+        </Switch>
       </Container>
     );
   }
 }
 
-export default Court;
+export default withRouter(Court);

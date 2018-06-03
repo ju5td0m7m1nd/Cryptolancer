@@ -73,7 +73,12 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
   }
-
+  componentWillMount() {
+    const section = location.pathname.split("dashboard/")[1];
+    if (!section) {
+      window.location.href = "/dashboard/task/browse";
+    }
+  }
   _route = path => (window.location.href = path);
 
   render() {
@@ -95,7 +100,7 @@ class Dashboard extends React.Component {
             </SidePanelLink>
             <SidePanelLink
               activate={section.indexOf("court") > -1}
-              onClick={() => this._route("/dashboard/court")}
+              onClick={() => this._route("/dashboard/court/browse")}
               borderColor="#D11149"
             >
               <LinkIcon src="/images/icons/settings.svg" />
@@ -121,7 +126,7 @@ class Dashboard extends React.Component {
           <Content>
             <Switch>
               <Route path={`${match.url}/task/:section`} component={Task} />
-              <Route path={`${match.url}/court`} component={Court} />
+              <Route path={`${match.url}/court/:section`} component={Court} />
               <Route path={`${match.url}/wallet`} component={Wallet} />
               <Route path={`${match.url}/settings`} component={Settings} />
             </Switch>
