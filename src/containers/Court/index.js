@@ -9,7 +9,6 @@ import Dispute from "./components/dispute";
 const Container = styled.div`
   width: 100%;
   height: 100%;
-  background-color: #fff;
 `;
 
 class Court extends React.Component {
@@ -21,8 +20,7 @@ class Court extends React.Component {
       <Container>
         <Router>
           <Switch>
-            {/* <Route path="/" component={Browse} /> */}
-            <Route path={`/dashboard/Court/dispute`} component={Dispute} />
+            <Route path={`/dashboard/court/dispute`} component={Dispute} />
           </Switch>
         </Router>
       </Container>

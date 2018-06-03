@@ -5,31 +5,19 @@ import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
 
 const Container = styled.section`
-  background-color: #fff;
-  border-top: solid 1px #707070;
-  border: solid 1px #707070;
-  border-radius: 12px;
+  background-color: transparent;
   width: 80%;
-  height: 80%;
   margin-top: 24px;
   padding: 32px;
-  // display: flex;
-  // align-items: flex-start;
-  // justify-content: space-between;
-  
 `;
 
-const DisputeContainer = styled.section`
+const Block = styled.div`
   background-color: #fff;
   border-top: solid 1px #707070;
   border: solid 1px #707070;
-  width: 80%;
-  height: 80%;
+  width: 100%;
   margin-top: 24px;
   padding: 32px;
-  //display: flex;
-  //align-items: flex-start;
-  //justify-content: space-between;
   border-radius: 12px;
 `;
 
@@ -43,7 +31,6 @@ const DisputeInnerContainer = styled.section`
   justify-content: space-between;
 `;
 
-
 const SpecIDBlock = styled.section`
   -webkit-flex: initial;
   flex: initial;
@@ -51,7 +38,7 @@ const SpecIDBlock = styled.section`
   margin-left: 0px;
   margin-right: 10px;
   display: inline;
-`; 
+`;
 
 const ArgumentBlock = styled.section`
   -webkit-flex: none;
@@ -71,7 +58,6 @@ const JudgementBlock = styled.section`
   display: inline;
 `;
 
-
 const Wrapper = styled.div`
   width: 80%;
   display: flex;
@@ -82,23 +68,20 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-
-const ProjectName = styled.h1`
-  font-size: 20px;
+const ProjectName = styled.h2`
+  font-size: 1.5vmax;
   font-family: Raleway;
   font-weight: bold;
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
-  line-height: 1.16;
   text-align: left;
   color: #303030;
-  width: 100%;
-
+  margin: 0px;
 `;
 
 const Label = styled.h3`
-  font-size: 16px;
+  font-size: 1.2vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -110,7 +93,7 @@ const Label = styled.h3`
 `;
 
 const Title = styled.h2`
-  font-size: 20px;
+  font-size: 1.5vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -122,7 +105,7 @@ const Title = styled.h2`
 `;
 
 const Subject = styled.h2`
-  font-size: 18px;
+  font-size: 1.2vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -132,18 +115,6 @@ const Subject = styled.h2`
   margin-bottom: 25px;
   color: #303030;
   width: 100%;
-`;
-
-const Input = styled.input`
-  font-size: 16px;
-  font-weight: lighter;
-  text-align: left;
-  color: #4894fc;
-  padding: 8px;
-  background-color: transparent;
-  border: 0px;
-  outline: none;
-  width: 60%;
 `;
 
 const Back2BrowseBtn = styled.button`
@@ -165,72 +136,66 @@ const RadioBtn = styled.button`
   border: 0px;
   background-color: transparent;
   text-align: left;
-  
 `;
 
 const SubmitBtn = styled.button`
-  margin-left: 72%;
-  margin-right: auto;
   outline: none;
   font-size: 20px;
   color: #d11149;
   border: 0px;
   background-color: transparent;
-  bottom: 0;
-  position: relative;
-  margin-top: 5em;
-  margin-bottom: 10em;
-
+  float: right;
+  margin: 24px 0px;
 `;
 
-const Hr = styled.hr `
-    display: block;
-    margin-top: 0.5em;
-    margin-bottom: 4em;
-    margin-left: auto;
-    margin-right: auto;
-    border-style: inset;
-    border-width: 1px;
-    color: #707070;
+const Hr = styled.hr`
+  display: block;
+  margin-top: 0.5em;
+  margin-bottom: 4em;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: inset;
+  border-width: 1px;
+  color: #707070;
 `;
-const Line = styled.hr `
-    display: block;
-    margin-top: -0.5em;
-    margin-bottom: 1em;
-    margin-left: auto;
-    margin-right: auto;
-    border-style: inset;
-    border-width: 1px;
-    color: #707070;
+const Line = styled.hr`
+  display: block;
+  margin-top: -0.5em;
+  margin-bottom: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  border-style: inset;
+  border-width: 1px;
+  color: #707070;
 `;
-
 
 var IPFS_DATA = "";
 
 class Form extends React.Component {
   constructor(props) {
     super(props);
-    //read IPFS    
-    var ipfsPath="QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU"
+    //read IPFS
+    var ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
     //var ipfsPath="QmfR2Lz38ndu8qv6xXy7oSKC4GnKqN7oLFwyzY4z3Kzwdi"
     this.state = {
       ipfsData: "",
       currentUser: "testUser",
       name: "<test> Convert website to android and iOS application",
-      description: "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
+      description:
+        "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
       detailSpec: "<test> Put it onto App store and GooglePlay.",
       disputes: [""],
       disputeLength: 0,
       submit: "unfinished"
     };
-    var content = ""
-    var thisPtr = this; 
+    var content = "";
+    var thisPtr = this;
     ipfs.files.cat(ipfsPath, function(err, res) {
-      if(!err){    
-        IPFS_DATA = res.toString();  
+      if (!err) {
+        IPFS_DATA = res.toString();
         //load IPFS to web
         content = JSON.parse(IPFS_DATA);
-        for (var i=0; i<content.arguments.length; i++) {
+        for (var i = 0; i < content.arguments.length; i++) {
           content.arguments[i]["dec"] = "agree";
         }
         thisPtr.setState({
@@ -241,30 +206,29 @@ class Form extends React.Component {
           disputes: content.arguments,
           disputeLength: content.arguments.length
         });
-        
       } else {
         alert("ipfs download error");
-        console.error('cat error', res);
+        console.error("cat error", res);
       }
     });
-    
   }
   _autoGrow = e => {
     e.style.height = "10px";
     e.style.height = e.scrollHeight + 20 + "px";
   };
 
-
-  _handleOptionChange =  (e, dispute) => {
+  _handleOptionChange = (e, dispute) => {
     var newArray = this.state.disputes;
     var specID = dispute.dispute.spec_ID;
-    for (var i=0; i<newArray.length; i++){
+    for (var i = 0; i < newArray.length; i++) {
       if (newArray[i]["spec_ID"] == specID) {
         newArray[i]["dec"] = e.target.value;
       }
     }
     //newArray.push("specID");
-    this.setState({disputes:newArray}, function(){ console.log(this.state.disputes) })
+    this.setState({ disputes: newArray }, function() {
+      console.log(this.state.disputes);
+    });
   };
 
   _handleChange = (e, type) => this.setState({ [type]: e.target.value });
@@ -273,119 +237,134 @@ class Form extends React.Component {
     //edit polling condition
     var newArray = this.state.disputes;
     console.log(this.state.disputes);
-    for (var i=0; i<this.state.disputes.length; i++){
+    for (var i = 0; i < this.state.disputes.length; i++) {
       if (this.state.disputes[i]["dec"] == "agree") {
         if (newArray[i]["voteYes"] == null) {
           newArray[i]["voteYes"] = new Array();
-        }else {
+        } else {
           newArray[i]["voteYes"] = Array.from(newArray[i]["voteYes"]);
         }
         newArray[i]["voteYes"].push(this.state.currentUser);
-      }
-      else {
+      } else {
         if (newArray[i]["voteNo"] == null) {
           newArray[i]["voteNo"] = new Array();
-        }else {
+        } else {
           newArray[i]["voteNo"] = Array.from(newArray[i]["voteNo"]);
         }
         newArray[i]["voteNo"].push(this.state.currentUser);
       }
     }
-    this.setState({
-      disputes:newArray,
-      submit: "finish"
-    }, function(){ console.log(this.state.disputes) })
-    
+    this.setState(
+      {
+        disputes: newArray,
+        submit: "finish"
+      },
+      function() {
+        console.log(this.state.disputes);
+      }
+    );
+
     //upload IPFS
 
     var content = this.state.ipfsData;
-    console.log("ipfsData arguments: ",this.state.ipfsData.arguments)
-    console.log("disputes: ", this.state.disputes)
+    console.log("ipfsData arguments: ", this.state.ipfsData.arguments);
+    console.log("disputes: ", this.state.disputes);
     content.arguments = this.state.disputes;
 
     const buffer = Buffer.from(JSON.stringify(content), "utf8"); // text string to Buffer
     await ipfs.add(buffer, (err, ipfsHash) => {
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
       // alert(fileAddress);
-      
-      
+
       // TODO add to contract
     });
-  
   };
   render() {
-
-
     return (
-      <div>
-      <Back2BrowseBtn> &lt; Back to Browse</Back2BrowseBtn>
       <Container>
-          <ProjectName> {this.state.name} </ProjectName>
-          <Label> {this.state.description} </Label>
-      </Container>
+        <Back2BrowseBtn> &lt; Back to Browse</Back2BrowseBtn>
+        <Block>
+          <ProjectName>
+            {" "}{this.state.name}{" "}
+          </ProjectName>
+          <Label>
+            {" "}{this.state.description}{" "}
+          </Label>
+        </Block>
 
-      <Title>Task Requirement</Title>
-      <Container>
-        <Subject>Detail specification</Subject>
-        <Label>{this.state.detailSpec}</Label>
-        <Hr></Hr>
-        
-      </Container>
+        <Title>Task Requirement</Title>
+        <Block>
+          <Subject>Detail specification</Subject>
+          <Label>
+            {this.state.detailSpec}
+          </Label>
+          <Hr />
+        </Block>
 
-      <Title>Dispute</Title>
-      <DisputeContainer>
-        <DisputeInnerContainer>
-        <SpecIDBlock>
-          <Label>Spec ID</Label>
-        </SpecIDBlock>
-        <ArgumentBlock>
-          <Label>Argument</Label>
-        </ArgumentBlock>
-        <JudgementBlock>
-          <Label>Judgement</Label>
-          <RadioBtn></RadioBtn>
-        </JudgementBlock>
-        </DisputeInnerContainer>
-        <Line></Line>
-        <Label>
-        {
-            this.state.disputes.map((dispute) => (
-              <DisputeInnerContainer key={dispute.spec_ID}>
+        <Title>Dispute</Title>
+        <Block>
+          <DisputeInnerContainer>
+            <SpecIDBlock>
+              <Label>Spec ID</Label>
+            </SpecIDBlock>
+            <ArgumentBlock>
+              <Label>Argument</Label>
+            </ArgumentBlock>
+            <JudgementBlock>
+              <Label>Judgement</Label>
+              <RadioBtn />
+            </JudgementBlock>
+          </DisputeInnerContainer>
+          <Line />
+          <Label>
+            {this.state.disputes.map((dispute, key) =>
+              <DisputeInnerContainer key={key}>
                 <SpecIDBlock>
-                  <Label>#{dispute.spec_ID}</Label>
+                  <Label>
+                    #{dispute.spec_ID}
+                  </Label>
                 </SpecIDBlock>
                 <ArgumentBlock>
-                  <Label>{dispute.argument}</Label>
+                  <Label>
+                    {dispute.argument}
+                  </Label>
                 </ArgumentBlock>
                 <JudgementBlock>
                   <Label>
-                  <input type="radio" value="agree" 
-                      checked={dispute.dec === 'agree'} 
-                      onChange={e => this._handleOptionChange(e, {dispute})} />
-                   Reasonable
+                    <input
+                      type="radio"
+                      value="agree"
+                      checked={dispute.dec === "agree"}
+                      onChange={e => this._handleOptionChange(e, { dispute })}
+                      style={{ marginRight: "8px" }}
+                    />
+                    Reasonable
                   </Label>
                   <Label>
-                  <input type="radio" value="disagree" 
-                      checked={dispute.dec === 'disagree'} 
-                      onChange={e => this._handleOptionChange(e, {dispute})} />
-                   Not Convincible
+                    <input
+                      type="radio"
+                      value="disagree"
+                      checked={dispute.dec === "disagree"}
+                      onChange={e => this._handleOptionChange(e, { dispute })}
+                      style={{ marginRight: "8px" }}
+                    />
+                    Not Convincible
                   </Label>
-
-                </JudgementBlock>  
-              </DisputeInnerContainer>              
-            ))
-        }
-        </Label>
-      <Hr></Hr>
-      </DisputeContainer>
-      <Title>Attachment</Title>
-      <Container>
-        
+                </JudgementBlock>
+              </DisputeInnerContainer>
+            )}
+          </Label>
+          <Hr />
+        </Block>
+        <Title>Attachment</Title>
+        <Block />
+        <SubmitBtn
+          onClick={this._submit}
+          disabled={this.state.submit === "finish"}
+        >
+          Submit >
+        </SubmitBtn>
       </Container>
-      <SubmitBtn onClick={this._submit} disabled={this.state.submit === "finish"}>Submit ></SubmitBtn>
-      </div>
-      
-      
     );
   }
 }
