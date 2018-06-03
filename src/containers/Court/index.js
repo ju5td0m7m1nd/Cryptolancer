@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import Browse from "./components/browse";
 import Ongoing from "./components/ongoing";
 import History from "./components/history";
+import Dispute from "./components/dispute";
 
 const Container = styled.div`
   width: 100%;
@@ -20,7 +21,8 @@ class Court extends React.Component {
       <Container>
         <Router>
           <Switch>
-            <Route path="/" component={Browse} />
+            {/* <Route path="/" component={Browse} /> */}
+            <Route path={`/dashboard/Court/dispute`} component={Dispute} />
           </Switch>
         </Router>
       </Container>
