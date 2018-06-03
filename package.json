@@ -50,6 +50,8 @@
   },
   "dependencies": {
     "dotenv": "^2.0.0",
+    "firebase": "^5.0.4",
+    "formik": "^0.11.11",
     "ipfs-api": "^22.0.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

@@ -22,7 +22,7 @@ const Container = styled.div`
 const SidePanel = styled.div`
   width: 20%;
   height: 100%;
-  padding: 5% 0px;
+  padding: 0px 0px;
 `;
 
 const SidePanelLink = styled.div`
@@ -35,23 +35,28 @@ const SidePanelLink = styled.div`
   font-stretch: normal;
   letter-spacing: normal;
   text-align: center;
-  color: ${props => (props.activate ? props.borderColor : "#707070")};
-  padding: 12px 0px;
+  margin-top: 8px;
+  color: ${props => (props.activate ? props.borderColor : "#ABADAE")};
+  padding: 16px 0px;
   border-left: ${props =>
     props.activate
       ? `6px solid ${props.borderColor}`
       : "6px solid transparent"};
+  p {
+    font-size: 20px;
+  }
 `;
 
 const LinkIcon = styled.img`
   width: 24px;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin-left: 20px;
+  margin-right: 20px;
 `;
 
 const Main = styled.main`
   width: 100%;
   height: 85%;
+  padding-top: 2%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -59,7 +64,6 @@ const Main = styled.main`
 
 const Content = styled.div`
   width: 80%;
-  padding-top: 5%;
   height: 100%;
 `;
 
