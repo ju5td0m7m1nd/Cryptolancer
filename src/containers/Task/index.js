@@ -15,7 +15,7 @@ import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
 
 const Container = styled.div`
-  width: 60%;
+  width: 90%;
   height: 100%;
   background-color: tranparent;
 `;

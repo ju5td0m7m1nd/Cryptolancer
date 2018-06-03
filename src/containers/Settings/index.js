@@ -104,8 +104,50 @@ const Textarea = styled.textarea`
   outline: none;
 `;
 
+const Input = styled.input`
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Raleway;
+  text-align: left;
+  color: #303030;
+  padding: 8px;
+  background-color: transparent;
+  border: 0px;
+  outline: none;
+  width: 100%;
+`;
+
+const UpdateBtn = styled.button`
+  color: ${props => props.theme.fg};
+  border: 5px solid ${props => props.theme.fg};
+  background: ${props => props.theme.bg};
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border-radius: 20px;
+`;
+
+const theme = {
+  bg: '#4894fc',
+  fg: 'white'
+};
+
+const Textarea = styled.textarea`
+  width: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  color: #303030;
+  font-family: Raleway;
+  padding: 8px;
+  background-color: transparent;
+  border: 0px;
+  outline: none;
+`;
+
+
 class Settings extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.state = {
       account: "",
