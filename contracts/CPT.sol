@@ -1,5 +1,4 @@
-pragma solidity ^0.4.16;
-
+pragma solidity ^0.4.20;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract TokenERC20 {
@@ -43,7 +42,7 @@ contract TokenERC20 {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
         // Check if the sender has enough
-        require(balanceOf[_from] >= _value);
+        //require(balanceOf[_from] >= _value);
         // Check for overflows
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         // Save this for an assertion in the future
