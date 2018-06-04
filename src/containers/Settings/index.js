@@ -123,6 +123,7 @@ class Settings extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.web3 && this.state.web3) {
       this._fetchData(this.state.web3);
+      console.log(this.state.web3);
     }
   }
 
