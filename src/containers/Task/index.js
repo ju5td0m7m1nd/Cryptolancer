@@ -13,6 +13,9 @@ import Ongoing from "./components/ongoing";
 import History from "./components/history";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
+import { CPLInstance } from "../../utils/getContract";
+import getWeb3 from "../../utils/getWeb3";
+import ipfs from "../../utils/ipfs";
 
 const Container = styled.div`
   width: 90%;
@@ -23,16 +26,27 @@ const Container = styled.div`
 class Task extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      CPL: null,
+      web3: null
+    };
   }
 
-  componentWillReceivesProps(nextState, nextProps) {}
+  async componentDidMount() {
+    const CPL = await CPLInstance();
+    const web3 = (await getWeb3).web3;
+    this.setState({ CPL, web3 });
+  }
+
   _route = path => this.props.history.push(path);
 
   render() {
     const { match } = this.props;
     const { section } = this.props.match.params;
     const { pathname } = this.props.location;
+    const { CPL, web3 } = this.state;
     const hideNavBar = pathname.indexOf("create") > -1;
+
     return (
       <Container>
         {hideNavBar
@@ -40,11 +54,18 @@ class Task extends React.Component {
           : <Navbar section={section} color="#f17105" route={this._route} />}
 
         <Switch>
-          <Route exact path={`/dashboard/task/browse`} component={Browse} />
-          <Route path={`/dashboard/task/create`} component={Create} />
+          <Route
+            exact
+            path={`/dashboard/task/browse`}
+            component={props => <Browse {...props} CPL={CPL} web3={web3} />}
+          />
+          <Route
+            path={`/dashboard/task/create`}
+            component={() => <Create CPL={CPL} web3={web3} />}
+          />
           <Route path={`/dashboard/task/ongoing`} component={Ongoing} />
           <Route path={`/dashboard/task/history`} component={History} />
-          <Route path="/dashboard/task/browse/:id" component={Detail} />
+          <Route path="/dashboard/task/browse/:ipfs" component={Detail} />
         </Switch>
       </Container>
     );

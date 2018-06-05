@@ -8,62 +8,87 @@ contract CPL {
   
   mapping(address => ContractBox[]) public Contracts;
   mapping(address => ContractBox[]) public Contracts_free;
-  
+  address[] issuers; 
   struct ContractBox {
-    bytes32 name;
-    bytes32 ipfs;
-	uint256 price;
-	address contractor;
-	address issuer;
-	uint state; // 0 : pendding  ; 1 : launch ;  2 : discontinued
+    string name;
+    string ipfs;
+    uint256 price;
+    address contractor;
+    address issuer;
+    uint state; // 0 : pendding  ; 1 : launch ;  2 : discontinued
   }
 
-	function createProject(bytes32 _name, bytes32 _ipfs, uint256 _priceProject) public {
+	function createProject(string _name, string _ipfs, uint256 _priceProject) public {
+
+        // if first init, push to issuers array
+        if (Contracts[msg.sender].length == 0) {
+          issuers.push(msg.sender);
+        }
+
       	Contracts[msg.sender].push(ContractBox({
           name: _name,
           ipfs: _ipfs,
           price: _priceProject,
           contractor: address(0),
-		  issuer: msg.sender,
+          issuer: msg.sender,
           state: 0
       }));
 	}
 
+  function getIssuerWithIndex(uint index) public returns (address issuer) {
+    return issuers[index];
+  }
+
+  function getAllContractCount() public returns (uint length) {
+    return issuers.length;
+  }
+
 	function getContractCount(address _personalAddr) public returns(uint length) {
 		return Contracts[_personalAddr].length;
 	}
-	function getContract(address _personalAddr, uint index) public returns (bytes32 ipfs) {
+	function getContract(address _personalAddr, uint index) public returns (string ipfs) {
 		return Contracts[_personalAddr][index].ipfs;
 	}
 	function getContractFreeCount(address _personalAddr) public returns(uint length) {
 		return Contracts_free[_personalAddr].length;
 	}
-	function getContractFree(address _personalAddr, uint index) public returns(bytes32 ipfs) {
+	function getContractFree(address _personalAddr, uint index) public returns(string ipfs) {
 		return Contracts_free[_personalAddr][index].ipfs;
 	}
 
 	
-	function getProjectContractOwner(address _owner, bytes32 _ipfs) private returns (uint) {
+	function getProjectContractOwner(address _owner, string _ipfs) private returns (uint) {
 	    uint i = 0 ;
 	    for(i = 0 ; i < Contracts[_owner].length ; i++) {
-	        if(Contracts[_owner][i].ipfs == _ipfs)
+	        if(stringsEqual(Contracts[_owner][i].ipfs, _ipfs))
 	            break;
 	    }
 	    return(i);
 	}
 	
-	function getProjectFree(address _freeLancer, bytes32 _ipfs) private returns (uint){
+	function getProjectFree(address _freeLancer, string _ipfs) private returns (uint){
 	    uint i = 0 ;
 	    for(i = 0 ; i < Contracts_free[_freeLancer].length ; i++)
 	    {
-	        if(Contracts_free[_freeLancer][i].ipfs == _ipfs)
+	        if(stringsEqual(Contracts_free[_freeLancer][i].ipfs,  _ipfs))
 	            break;
 	    }
 	    return(i);
 	}
+  function updateContractFromApplicant(string old_ipfs, string new_ipfs, address _contractOwner)public{
+	    require(msg.sender != address(0));
+	    uint i = getProjectContractOwner(_contractOwner , old_ipfs);
+		address _freeLancer = Contracts[_contractOwner][i].contractor;
+	    require(Contracts[_contractOwner][i].state == 1);//launch
+
+		uint j = getProjectFree(_freeLancer, old_ipfs);
+		
+		require(Contracts_free[_freeLancer][j].state == 1);
+		Contracts[_contractOwner][i].ipfs = new_ipfs;
+		Contracts_free[_freeLancer][j].ipfs = new_ipfs;
+	}
 	
-	// if you want to update contract, you should set toke first
-	function updateContractFromOwner(bytes32 old_ipfs, bytes32 new_ipfs)public{
+	function updateContractFromOwner(string old_ipfs, string new_ipfs)public{
 	    require(msg.sender != address(0));
 	    uint i = getProjectContractOwner(msg.sender , old_ipfs);
 		address _freeLancer = Contracts[msg.sender][i].contractor;
@@ -76,7 +101,18 @@ contract CPL {
 		Contracts_free[_freeLancer][j].ipfs = new_ipfs;
 	}
 
-	function updateContractFromFreelancer(bytes32 old_ipfs, bytes32 new_ipfs)public{
+  function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
+		bytes storage a = bytes(_a);
+		bytes memory b = bytes(_b);
+		if (a.length != b.length)
+			return false;
+		// @todo unroll this loop
+		for (uint i = 0; i < a.length; i ++)
+			if (a[i] != b[i])
+				return false;
+		return true;
+	}
+  function updateContractFromFreelancer(string old_ipfs, string new_ipfs)public{
 	    require(msg.sender != address(0));
 	    uint i = getProjectFree(msg.sender, old_ipfs);
 		address _issuer = Contracts_free[msg.sender][i].issuer;
@@ -88,8 +124,21 @@ contract CPL {
 		Contracts[_issuer][i].ipfs = new_ipfs;
 		Contracts_free[msg.sender][j].ipfs = new_ipfs;
 	}
+
+  function assignContract(address _contractor, string _ipfs) public {
+	    require(msg.sender != address(0));
+	   
+	    uint i = getProjectContractOwner(msg.sender, _ipfs);
+		//freeLancer = _freeLancer;
+	    require(Contracts[msg.sender][i].state == 0);//pendding
+	    require(Contracts[msg.sender][i].contractor == address(0));
+	    Contracts[msg.sender][i].state = 1;
+	    Contracts[msg.sender][i].contractor = _contractor ;
+	    // freelancer information
+	    Contracts_free[_contractor].push(Contracts[_contractor][i]);
+  }
 	
-	function receiveContract(address _contractOwner, bytes32 _ipfs)public{
+	function receiveContract(address _contractOwner, string _ipfs)public{
 	    require(msg.sender != address(0));
 	   
 	    uint i = getProjectContractOwner(_contractOwner, _ipfs);
@@ -103,7 +152,7 @@ contract CPL {
 	}
 
     
-	function terminateContract(address _contractOwner, address _freeLancer, bytes32 _ipfs  , uint256 percent, address tokenAddress) public payable{
+	function terminateContract(address _contractOwner, address _freeLancer, string _ipfs  , uint256 percent, address tokenAddress) public payable{
 	    uint contractIdByContractOwner = getProjectContractOwner(_contractOwner, _ipfs);
 		require(_freeLancer == Contracts[_contractOwner][contractIdByContractOwner].contractor);
 	    require(Contracts[_contractOwner][contractIdByContractOwner].state == 1);//launch

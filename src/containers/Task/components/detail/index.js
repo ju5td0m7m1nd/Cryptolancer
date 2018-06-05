@@ -1,8 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
+import ipfs from "../../../../utils/ipfs";
 
-const Container = styled.section`width: 100%;`;
+const Container = styled.section`
+  width: 100%;
+  padding: 0px 0px 32px;
+`;
 
 const SectionBlock = styled.div`
   width: 100%;
@@ -133,6 +137,27 @@ const mockData = {
 class Detail extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      task: [],
+      loading: true
+    };
+  }
+  componentDidMount() {
+    ipfs.files.cat(this.props.match.params.ipfs, (err, res) => {
+      if (!err) {
+        const IPFS_DATA = res.toString();
+        //load IPFS to web
+        const content = JSON.parse(IPFS_DATA);
+        if (content.status === 0) {
+          this.setState({
+            task: this.state.task.concat(content),
+            loading: false
+          });
+        }
+      } else {
+        console.log(err);
+      }
+    });
   }
   render() {
     const {
@@ -144,6 +169,7 @@ class Detail extends React.Component {
       endDate,
       spec
     } = mockData;
+    const { task } = this.state;
     return (
       <Container>
         <BackBtn
@@ -151,43 +177,51 @@ class Detail extends React.Component {
         >
           {"< Back to Browse"}
         </BackBtn>
-        <SectionBlock>
-          <InfoWrapper>
-            <InfoTitle>
-              {name}
-            </InfoTitle>
-            <InfoDescription>
-              {description}
-            </InfoDescription>
-            <InfoSkills>
-              {skills
-                .reduce((pre, cur) => pre.concat(`${cur},`), "")
-                .slice(0, -1)}
-            </InfoSkills>
-            <InfoBudget>
-              $ {budget}
-            </InfoBudget>
-          </InfoWrapper>
-        </SectionBlock>
-        <SectionTitle>Timeline</SectionTitle>
-        <SectionBlock>
-          <DateInfo>
-            <h3>Start Date</h3>
-            <p>
-              {startDate.toDateString()}
-            </p>
-          </DateInfo>
-          <DateInfo>
-            <h3>End Date</h3>
-            <p>
-              {endDate.toDateString()}
-            </p>
-          </DateInfo>
-        </SectionBlock>
-        <SectionTitle>Task Requirement</SectionTitle>
-        <SectionBlock>
-          {spec.map((s, key) => <Spec key={key}>{`${key + 1}. ${s}`}</Spec>)}
-        </SectionBlock>
+        {task.length > 0
+          ? <div>
+              <SectionBlock>
+                <InfoWrapper>
+                  <InfoTitle>
+                    {task[0].name}
+                  </InfoTitle>
+                  <InfoDescription>
+                    {task[0].description}
+                  </InfoDescription>
+                  <InfoSkills>
+                    {task[0].requiredSkills}
+                  </InfoSkills>
+                  <InfoBudget>
+                    $ {task[0].budget}
+                  </InfoBudget>
+                </InfoWrapper>
+              </SectionBlock>
+              <SectionTitle>Timeline</SectionTitle>
+              <SectionBlock>
+                <DateInfo>
+                  <h3>Start Date</h3>
+                  <p>
+                    {task[0].startDate}
+                  </p>
+                </DateInfo>
+                <DateInfo>
+                  <h3>End Date</h3>
+                  <p>
+                    {task[0].endDate}
+                  </p>
+                </DateInfo>
+              </SectionBlock>
+              <SectionTitle>Task Requirement</SectionTitle>
+              <SectionBlock>
+                <Spec>
+                  {task[0].detailspec}
+                </Spec>
+
+                {/* {spec.map((s, key) =>
+                  <Spec key={key}>{`${key + 1}. ${s}`}</Spec>
+                )} */}
+              </SectionBlock>
+            </div>
+          : null}
       </Container>
     );
   }

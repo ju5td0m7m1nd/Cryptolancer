@@ -79,18 +79,18 @@ class Task extends React.Component {
     super(props);
   }
   render() {
+    const {contract, routeDetail} = this.props;
     return (
       <Block>
-        <Price>250000</Price>
+        <Price>{contract.budget}</Price>
         <Center>
-          <Head>Convert website to android and iOS application. </Head>
+          <Head>{contract.name}</Head>
           <Body>
-            We use reactjs on website, so it will be easy to convert to app if
-            you're familiar with React Native
+           {contract.description}
           </Body>
-          <Datetime>2018/05/12 - 2018/06/24</Datetime>
+          <Datetime>{contract.startDate} - {contract.endDate}</Datetime>
         </Center>
-        <DetailBtn>More Detail > </DetailBtn>
+        <DetailBtn onClick={() => routeDetail(contract.ipfs)}>More Detail > </DetailBtn>
       </Block>
     );
   }

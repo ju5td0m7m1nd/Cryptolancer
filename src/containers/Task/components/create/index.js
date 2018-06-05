@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
+import { withRouter } from "react-router";
 
 const Container = styled.section`
   background-color: #f9f9f9;
@@ -130,14 +131,14 @@ const BackBtn = styled.div`
 `;
 
 const PROGRESS = {
-  basicInfo: ["title", "requiredSkills", "budget", "description"],
+  basicInfo: ["name", "requiredSkills", "budget", "description"],
   timeline: ["startDate", "endDate"],
   taskrequirement: ["detailspec"],
   submit: []
 };
 
 const INPUT_NAME = {
-  title: "Title",
+  name: "Title",
   requiredSkills: "Required Skills",
   budget: "Budget",
   description: "Description",
@@ -161,6 +162,7 @@ class Form extends React.Component {
       currentProgress: "basicInfo"
     };
   }
+
   _autoGrow = e => {
     e.style.height = "10px";
     e.style.height = e.scrollHeight + 20 + "px";
@@ -178,29 +180,36 @@ class Form extends React.Component {
       name,
       requiredSkills,
       budget,
-      defaultValue,
+      description,
       startDate,
       endDate,
       detailspec
     } = this.state;
+    const { CPL, web3 } = this.props;
     const payload = {
       name,
       requiredSkills,
       budget,
-      defaultValue,
       startDate,
       endDate,
-      detailspec
+      detailspec,
+      description,
+      status: 0,
+      applicant: [],
+      selectedNumber: [],
+      finalResult: []
     };
     const buffer = Buffer.from(JSON.stringify(payload), "utf8"); // text string to Buffer
 
-    await ipfs.add(buffer, (err, ipfsHash) => {
+    await ipfs.add(buffer, async (err, ipfsHash) => {
       // setState by setting ipfsHash to ipfsHash[0].hash
-      this.setState({ ipfsHash: ipfsHash[0].hash });
-      const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
-      alert(fileAddress);
-      // TODO add to contract
-      console.log(fileAddress);
+      //this.setState({ ipfsHash: ipfsHash[0].hash });
+      //const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
+      await CPL.createProject(name, ipfsHash[0].hash, budget, {
+        from: web3.eth.accounts[0]
+      });
+      this.props.history.push("/dashboard/task/browse");
+      //console.log(fileAddress);
     });
   };
   render() {
@@ -282,4 +291,4 @@ class Form extends React.Component {
   }
 }
 
-export default Form;
+export default withRouter(Form);
