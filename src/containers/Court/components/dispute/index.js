@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TaskSummary from "./TaskSummary";
 import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
+import { CPLInstance } from "../../../../utils/getContract";
 
 const Container = styled.section`
   background-color: transparent;
@@ -175,6 +176,8 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      CPL: null,
+      web3: null,
       ipfsData: "",
       currentUser: "testUser",
       name: "<test> Convert website to android and iOS application",
@@ -183,18 +186,37 @@ class Form extends React.Component {
       detailSpec: "<test> Put it onto App store and GooglePlay.",
       disputes: [""],
       disputeLength: 0,
+      jurors: null,
       submit: "unfinished"
+      
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._initData();
+
+    const CPL = await CPLInstance();
+    const web3 = (await getWeb3).web3;
+    this.setState(
+      { 
+        CPL: CPL, 
+        web3: web3,
+        currentUser: web3.eth.accounts[0]
+      },
+      function() {
+        console.log("web3: ", this.state.web3);
+        console.log("CPL: ", this.state.CPL);
+        console.log("user: ", this.state.currentUser);
+      }
+    );
+
   }
 
   _initData = () => {
     let content = "";
     let thisPtr = this;
-    const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    const ipfsPath = "Qmc7QVumD1dJqNUy7SuEwckP5GKJ5JN4yWZz9dzWZeVJNf";
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
         IPFS_DATA = res.toString();
@@ -209,8 +231,13 @@ class Form extends React.Component {
           description: content.requiredSkills,
           detailSpec: content.spec,
           disputes: content.arguments,
-          disputeLength: content.arguments.length
-        });
+          disputeLength: content.arguments.length,
+          jurors: content.jurors
+        },
+        function() {
+          console.log("jurors: ", thisPtr.state.jurors);
+        }
+      );
       } else {
         alert("ipfs download error");
         console.error("cat error", res);
@@ -241,46 +268,46 @@ class Form extends React.Component {
 
   _submit = async () => {
     //edit polling condition
-    var newArray = this.state.disputes;
-    console.log(this.state.disputes);
+    var choices = [];
+    var tmpArray = {};
+
     for (var i = 0; i < this.state.disputes.length; i++) {
       if (this.state.disputes[i]["dec"] == "agree") {
-        if (newArray[i]["voteYes"] == null) {
-          newArray[i]["voteYes"] = new Array();
-        } else {
-          newArray[i]["voteYes"] = Array.from(newArray[i]["voteYes"]);
-        }
-        newArray[i]["voteYes"].push(this.state.currentUser);
-      } else {
-        if (newArray[i]["voteNo"] == null) {
-          newArray[i]["voteNo"] = new Array();
-        } else {
-          newArray[i]["voteNo"] = Array.from(newArray[i]["voteNo"]);
-        }
-        newArray[i]["voteNo"].push(this.state.currentUser);
+        choices.push("agree");
+      }
+      else {
+        choices.push("disagree");
       }
     }
+    var newArray = this.state.jurors;
+    if (newArray.length == 0) {
+      newArray = new Array();
+    }
+
+    tmpArray["juror"] = this.state.currentUser;
+    tmpArray["tokenNum"] = 100;
+    tmpArray["voteCondition"] = choices;
+
+    newArray.push(tmpArray);
+
     this.setState(
       {
-        disputes: newArray,
+        jurors: newArray,
         submit: "finish"
       },
       function() {
-        console.log(this.state.disputes);
+        console.log(this.state.jurors);
       }
     );
 
     //upload IPFS
 
     var content = this.state.ipfsData;
-    console.log("ipfsData arguments: ", this.state.ipfsData.arguments);
-    console.log("disputes: ", this.state.disputes);
-    content.arguments = this.state.disputes;
-
+    content.jurors = this.state.jurors;
     const buffer = Buffer.from(JSON.stringify(content), "utf8"); // text string to Buffer
     await ipfs.add(buffer, (err, ipfsHash) => {
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
-      // alert(fileAddress);
+      alert(fileAddress);
 
       // TODO add to contract
     });
