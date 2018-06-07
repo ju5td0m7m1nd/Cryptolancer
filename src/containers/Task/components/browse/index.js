@@ -104,13 +104,17 @@ class Browse extends React.Component {
         );
 
         for (let i = 0; i < projectCount; i++) {
-          contracts.push((await CPL.getContract.call(issuer, i))[0]);
+          const r = await CPL.getContract.call(issuer, i);
+          contracts.push(r[0]);
         }
         return contracts;
       })
     );
-    const ipfss = requests.map(contract => contract.map(c => c));
+    const ipfss = requests.reduce((pre, cur) => {
+      return pre.concat(cur);
+    }, []);
     const validContracts = [];
+
     // read ipfs files
     let counter = 0;
     ipfss.map(i => {
