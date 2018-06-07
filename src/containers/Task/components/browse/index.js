@@ -104,7 +104,7 @@ class Browse extends React.Component {
         );
 
         for (let i = 0; i < projectCount; i++) {
-          contracts.push(await CPL.getContract.call(issuer, i));
+          contracts.push((await CPL.getContract.call(issuer, i))[0]);
         }
         return contracts;
       })
@@ -138,7 +138,8 @@ class Browse extends React.Component {
     this.props.history.push("/dashboard/task/create");
   };
 
-  _routeDetail = path => this.props.history.push(`/dashboard/task/browse/${path}`);
+  _routeDetail = path =>
+    this.props.history.push(`/dashboard/task/browse/${path}`);
 
   render() {
     const { validContracts, loading } = this.state;
