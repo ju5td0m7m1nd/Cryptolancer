@@ -57,7 +57,7 @@ contract CPL {
 	}
 
 	
-	function getContractIndexByIssuer(address _owner, string _ipfs) private returns (uint) {
+	function getContractIndexByIssuer(address _owner, string _ipfs) public returns (uint) {
 	    uint i = 0 ;
 	    for(i = 0 ; i < Contracts[_owner].length ; i++) {
 	        if(stringsEqual(Contracts[_owner][i].ipfs, _ipfs))
@@ -88,8 +88,9 @@ contract CPL {
 		Contracts_free[_freeLancer][j].ipfs = new_ipfs;
 	}
 	
-	function updateContractFromOwner(string old_ipfs, string new_ipfs)public{
+	function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
 	    require(msg.sender != address(0));
+		
 	    uint i = getContractIndexByIssuer(msg.sender , old_ipfs);
 		address _freeLancer = Contracts[msg.sender][i].contractor;
 	    require(Contracts[msg.sender][i].state == 1);//launch
@@ -101,22 +102,11 @@ contract CPL {
 		Contracts_free[_freeLancer][j].ipfs = new_ipfs;
 	}
 
-  function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
-		bytes storage a = bytes(_a);
-		bytes memory b = bytes(_b);
-		if (a.length != b.length)
-			return false;
-		// @todo unroll this loop
-		for (uint i = 0; i < a.length; i ++)
-			if (a[i] != b[i])
-				return false;
-		return true;
-	}
   function updateContractFromFreelancer(string old_ipfs, string new_ipfs)public{
 	    require(msg.sender != address(0));
 	    uint i = getContractIndexByContractor(msg.sender, old_ipfs);
 		address _issuer = Contracts_free[msg.sender][i].issuer;
-	    require(Contracts[msg.sender][i].state == 1);//launch
+	    require(Contracts_free[msg.sender][i].state == 1);//launch
 
 		uint j = getContractIndexByIssuer(_issuer, old_ipfs);
 
@@ -135,22 +125,15 @@ contract CPL {
 	    Contracts[msg.sender][i].state = 1;
 	    Contracts[msg.sender][i].contractor = _contractor ;
 	    // freelancer information
-	    //Contracts_free[_contractor].push(Contracts[_contractor][i]);
+	    Contracts_free[_contractor].push(ContractBox({
+          name: Contracts[msg.sender][i].name,
+          ipfs: Contracts[msg.sender][i].ipfs,
+          price: Contracts[msg.sender][i].price,
+          contractor: Contracts[msg.sender][i].contractor,
+          issuer: Contracts[msg.sender][i].issuer,
+          state: Contracts[msg.sender][i].state
+      }));
   }
-	
-	function receiveContract(address _contractOwner, string _ipfs)public{
-	    require(msg.sender != address(0));
-	   
-	    uint i = getContractIndexByIssuer(_contractOwner, _ipfs);
-		//freeLancer = _freeLancer;
-	    require(Contracts[_contractOwner][i].state == 0);//pendding
-	    require(Contracts[_contractOwner][i].contractor == address(0));
-	    Contracts[_contractOwner][i].state = 1;
-	    Contracts[_contractOwner][i].contractor = msg.sender ;
-	    // freelancer information
-	    Contracts_free[msg.sender].push(Contracts[_contractOwner][i]);
-	}
-
     
 	function terminateContract(address _contractOwner, address _freeLancer, string _ipfs  , uint256 percent, address tokenAddress) public payable{
     
@@ -160,11 +143,22 @@ contract CPL {
 
 		uint256 price = Contracts[_contractOwner][contractIdByContractOwner].price;
 
-      CPT coinContract = CPT(tokenAddress);
+     	 CPT coinContract = CPT(tokenAddress);
 	    coinContract.transferFrom(_contractOwner, _freeLancer, (price * percent / 100));
 	    Contracts[_contractOwner][contractIdByContractOwner].state = 2; //terminate
 		uint contractIdByFreelancer = getContractIndexByContractor(_contractOwner, _ipfs);
 		Contracts_free[_freeLancer][contractIdByFreelancer].state = 2 ;
+	}
+	 function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
+		bytes storage a = bytes(_a);
+		bytes memory b = bytes(_b);
+		if (a.length != b.length)
+			return false;
+		// @todo unroll this loop
+		for (uint i = 0; i < a.length; i ++)
+			if (a[i] != b[i])
+				return false;
+		return true;
 	}
 }
 
