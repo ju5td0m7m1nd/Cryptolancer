@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TaskSummary from "./TaskSummary";
 import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
+import { CPLInstance } from "../../../../utils/getContract";
 
 const Container = styled.section`
   background-color: transparent;
@@ -175,26 +176,103 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      CPL: null,
+      web3: null,
       ipfsData: "",
       currentUser: "testUser",
+      authority: "uncapable",
+      balance: 0,
+      tokenNum: 0,
       name: "<test> Convert website to android and iOS application",
       description:
         "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
       detailSpec: "<test> Put it onto App store and GooglePlay.",
       disputes: [""],
       disputeLength: 0,
+      jurors: null,
       submit: "unfinished"
     };
   }
 
-  componentDidMount() {
-    this._initData();
+  async componentDidMount() {
+    const CPL = await CPLInstance();
+    const web3 = (await getWeb3).web3;
+    web3.eth.getBalance(web3.eth.accounts[0], (err, res) => {
+      var balance = web3.toDecimal(res);
+      this.setState({balance: balance});
+    });
+    this.setState(
+      { 
+        CPL: CPL, 
+        web3: web3,
+        currentUser: web3.eth.accounts[0]
+      },
+      function() {
+        console.log("web3: ", this.state.web3);
+        console.log("CPL: ", this.state.CPL);
+        console.log("user: ", this.state.currentUser);
+        console.log("user balance: ", this.state.balance);
+      }
+    );
+    this._initData(CPL, web3);
   }
+
+  _checkAuthority = async () => {
+    const { CPL, web3, currentUser, jurors} = this.state;
+    const contractCount = web3.toDecimal(await CPL.getContractFreeCount.call(currentUser));
+    var contracts = [];
+    var cumulativeAmmount = 0;
+    console.log("currentUser: ", currentUser, " \\ contract num: ", contractCount);
+
+    // get currentUser's contracts 
+    for (let i = 0; i < contractCount; i++) {
+      var contract = await CPL.getContractFree.call(currentUser, i);
+      if(contract[1] == 2) {
+        contracts.push(contract[0]);
+      }
+    }
+    // read contract and add up cumulative ammount of contract prices
+    for (let i=0; i<contracts.length; i++) {
+      ipfs.files.cat(contracts[i], function(err, res) {
+        if (!err) {
+          const IPFS_DATA = res.toString();
+          const content = JSON.parse(IPFS_DATA);
+          cumulativeAmmount = cumulativeAmmount + content.budget; // "budget" should be altered to actual amount of payment
+        } else {
+          console.error("cat error", res);
+        }
+      });
+    }
+    if (cumulativeAmmount > this.state.budget) {
+      this.setState({
+        authority: "capable"
+      },
+      function() {
+        console.log("authority: ", this.state.authority);
+      });
+    }
+    
+    // check if the user has already voted
+    for (let i=0; i<jurors.length; i++) {
+      if(currentUser === jurors[i].juror) {
+        this.setState({
+          submit: "finish"
+        },
+        function() {
+          console.log("user has already voted!");
+        });
+      }
+    }
+  }
+
 
   _initData = () => {
     let content = "";
     let thisPtr = this;
-    const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const ipfsPath = "Qmc7QVumD1dJqNUy7SuEwckP5GKJ5JN4yWZz9dzWZeVJNf";
+    //const ipfsPath = "QmPVTzKhBmFyKNNt8g8pdJskDmnt7WetvqCv8YpA1du27F"; //4 jurors (+account 1)
+    const ipfsPath = "QmV2DGVBZuZhL8Deg6ZJ1jPhSdfQwvzekGiyZhNepbvViV"; //9 jurors
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
         IPFS_DATA = res.toString();
@@ -209,13 +287,20 @@ class Form extends React.Component {
           description: content.requiredSkills,
           detailSpec: content.spec,
           disputes: content.arguments,
-          disputeLength: content.arguments.length
+          disputeLength: content.arguments.length,
+          jurors: content.jurors
+        },
+        function() {
+          console.log("jurors: ", thisPtr.state.jurors);
         });
+      thisPtr._checkAuthority();
       } else {
-        alert("ipfs download error");
         console.error("cat error", res);
+        alert("cat error");
       }
+
     });
+
   };
 
   _autoGrow = e => {
@@ -237,53 +322,136 @@ class Form extends React.Component {
     });
   };
 
-  _handleChange = (e, type) => this.setState({ [type]: e.target.value });
-
-  _submit = async () => {
-    //edit polling condition
-    var newArray = this.state.disputes;
-    console.log(this.state.disputes);
-    for (var i = 0; i < this.state.disputes.length; i++) {
-      if (this.state.disputes[i]["dec"] == "agree") {
-        if (newArray[i]["voteYes"] == null) {
-          newArray[i]["voteYes"] = new Array();
-        } else {
-          newArray[i]["voteYes"] = Array.from(newArray[i]["voteYes"]);
-        }
-        newArray[i]["voteYes"].push(this.state.currentUser);
-      } else {
-        if (newArray[i]["voteNo"] == null) {
-          newArray[i]["voteNo"] = new Array();
-        } else {
-          newArray[i]["voteNo"] = Array.from(newArray[i]["voteNo"]);
-        }
-        newArray[i]["voteNo"].push(this.state.currentUser);
-      }
-    }
-    this.setState(
-      {
-        disputes: newArray,
-        submit: "finish"
-      },
-      function() {
-        console.log(this.state.disputes);
-      }
-    );
-
-    //upload IPFS
-
+  _updateIPFS = (finalResult) => {
     var content = this.state.ipfsData;
-    console.log("ipfsData arguments: ", this.state.ipfsData.arguments);
-    console.log("disputes: ", this.state.disputes);
-    content.arguments = this.state.disputes;
-
+    content.jurors = this.state.jurors;
+    content.finalResult = finalResult;
     const buffer = Buffer.from(JSON.stringify(content), "utf8"); // text string to Buffer
-    await ipfs.add(buffer, (err, ipfsHash) => {
+    ipfs.add(buffer, (err, ipfsHash) => {
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
-      // alert(fileAddress);
-
-      // TODO add to contract
+      console.log(fileAddress);
     });
+  };
+
+  _judge = (finalResult) => {
+    const { CPL, web3, jurors, disputes } = this.state;
+      const chosenJurorNum = 3; //choose 3 jurors
+      var candidates = JSON.parse(JSON.stringify(jurors));;
+      var chosenJurors = [];
+      var chosenResults = []; //[numOfJurors(3)][numOfProblems]
+       //[numOfProblems]
+      console.log("enough jurors!")
+      for (let i=0; i<chosenJurorNum; i++) { 
+        var totalTokenFromJurors = 0;
+        for (let j=0; j<candidates.length; j++) {
+          totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
+        }
+        //TODO: call random function from smart contract
+        //var chosenNum = CPL.getRandNum(totalTokenFromJurors)
+        //(test: 5, 45 , 85 are chosen)
+        var chosenNum = i*40+5;
+        var addUpToken = candidates[0].tokenNum;
+        var nextCandidate = 1;
+        var decArray = [];
+        while (addUpToken < chosenNum) {
+          addUpToken = addUpToken + candidates[nextCandidate++].tokenNum;
+        }
+        chosenJurors.push(candidates[nextCandidate-1].juror);
+        for(let j=0; j<disputes.length; j++) {
+          if (candidates[nextCandidate-1].voteCondition[j] == "agree") {
+            decArray.push(1);
+          }else {
+            decArray.push(0);
+          }
+        }
+        chosenResults.push(decArray);
+        candidates.splice(nextCandidate-1, 1);
+      }
+      console.log("chosen jurors: ", chosenJurors);
+      console.log("chosen results: ", chosenResults);
+
+      //get final voting result
+      for(let i=0; i<disputes.length; i++) {
+        var decTmp = 0;
+        for(let j=0; j<chosenJurorNum; j++) {
+          decTmp += chosenResults[j][i]
+        }
+        if (decTmp > chosenJurorNum/2){
+          finalResult.push("agree");
+        }else {
+          finalResult.push("disagree");
+        }
+      }
+      console.log("final result: ", finalResult);
+
+      //TODO: terminate smart contract (props)
+
+
+      return finalResult;
+  };
+
+  _handleChange = (e) => {
+    this.setState({ tokenNum: e.target.value });
+  };
+
+  _submit = () => {
+    //check token num
+    if (this.state.tokenNum <= this.state.balance && this.state.tokenNum > 0) {
+      //edit polling condition
+      var choices = [];
+      var tmpArray = {};
+
+      for (var i = 0; i < this.state.disputes.length; i++) {
+        if (this.state.disputes[i]["dec"] == "agree") {
+          choices.push("agree");
+        }
+        else {
+          choices.push("disagree");
+        }
+      }
+      var newArray = this.state.jurors;
+      if (newArray.length == 0) {
+        newArray = new Array();
+      }
+
+      tmpArray["juror"] = this.state.currentUser;
+      tmpArray["tokenNum"] = this.state.tokenNum;
+      tmpArray["voteCondition"] = choices;
+
+      newArray.push(tmpArray);
+
+      this.setState(
+        {
+          jurors: newArray,
+          submit: "finish"
+        },
+        function() {
+          console.log(this.state.jurors);
+        }
+      );
+
+      // check if there are already enough jurors
+      const numOfJurors = this.state.jurors.length;
+      var finalResult = [];
+      if (numOfJurors >= 10) {  //enough jurors
+        finalResult = this._judge(finalResult);
+      }
+
+      // check if token is less than balance and greater than 0
+      console.log("tokenNum: ", this.state.tokenNum);
+      console.log("balance: ", this.state.balance);
+      
+      //upload IPFS
+      this._updateIPFS(finalResult);
+
+      //TODO: add IPFS to contract(props)
+
+      //TODO: transfer token to our address
+
+    }
+    else {
+      alert("token should be greater than 0 and less than balance");
+    }
   };
   render() {
     return (
@@ -368,9 +536,11 @@ class Form extends React.Component {
         </Block>
         <Title>Attachment</Title>
         <Block />
+        Token: <input type='text' value={this.state.tokenNum} onChange={this._handleChange} />
         <SubmitBtn
           onClick={this._submit}
-          disabled={this.state.submit === "finish"}
+          disabled={this.state.submit === "finish" }
+          //disabled={this.state.submit === "finish" || this.state.authority === "uncapable"}
         >
           Apply
         </SubmitBtn>
