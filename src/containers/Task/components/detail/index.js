@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 import ipfs from "../../../../utils/ipfs";
+import Button from "../../../../components/Button";
 
 const Container = styled.section`
   width: 100%;
@@ -10,7 +11,7 @@ const Container = styled.section`
 
 const SectionBlock = styled.div`
   width: 100%;
-  padding: 24px;
+  padding: 24px 20% 24px 24px;
   background-color: #fff;
   border: solid 1px #707070;
   border-radius: 16px;
@@ -95,15 +96,20 @@ const DateInfo = styled.div`
   }
 `;
 
-const Spec = styled.p`
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  text-align: left;
-  color: #707070;
+const Spec = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  p {
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #707070;
+  }
 `;
 
 const BackBtn = styled.div`
@@ -116,6 +122,8 @@ const BackBtn = styled.div`
   color: #f17105;
   margin-bottom: 32px;
 `;
+
+const Apply = styled.div``;
 
 const mockData = {
   name: "Convert website to android and iOS application",
@@ -178,7 +186,11 @@ class Detail extends React.Component {
           {"< Back to Browse"}
         </BackBtn>
         {task.length > 0
-          ? <div>
+          ? <div
+              style={{
+                padding: "0px 0px 32px"
+              }}
+            >
               <SectionBlock>
                 <InfoWrapper>
                   <InfoTitle>
@@ -212,14 +224,23 @@ class Detail extends React.Component {
               </SectionBlock>
               <SectionTitle>Task Requirement</SectionTitle>
               <SectionBlock>
-                <Spec>
-                  {task[0].detailspec}
-                </Spec>
-
-                {/* {spec.map((s, key) =>
-                  <Spec key={key}>{`${key + 1}. ${s}`}</Spec>
-                )} */}
+                {task[0].detailspec.map((s, key) =>
+                  <Spec key={key}>
+                    <p>{`${key + 1}. ${s.text}`}</p>
+                    <p>{`${s.partition}%`}</p>
+                  </Spec>
+                )}
               </SectionBlock>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center"
+                }}
+              >
+                <Button text="Apply" />
+              </div>
             </div>
           : null}
       </Container>
