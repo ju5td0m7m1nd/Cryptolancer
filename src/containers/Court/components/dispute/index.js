@@ -191,6 +191,7 @@ class Form extends React.Component {
       disputeLength: 0,
       jurors: null,
       submit: "unfinished"
+      
     };
   }
 
