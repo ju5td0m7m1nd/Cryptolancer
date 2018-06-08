@@ -46,7 +46,7 @@
 
 * Step 3: Start a Ethereum node with `geth`
     ```
-    $ geth --identity "node1" --rpc --rpcport 8000 --rpccorsdomain "*" \
+    $ geth --identity "node1" --rpc --rpcport 8545 --rpccorsdomain "*" \
     --datadir . --port 30303 --nodiscover --maxpeers 25 \
     --rpcapi "eth,net,web3,admin,db,debug,miner,shh,txpool,personal" \
     --networkid 1114 console 2>> geth.log
@@ -110,7 +110,7 @@
 
 1. Start another peer
 
-    On your same machine instantiate a new datadir:
+    On your same machine instantiate a new datadir: (`genesis.json` must be same as 1st node)
     ```
     $ mkdir node2 && cd node2
     $ geth --datadir . init genesis.json
@@ -118,7 +118,7 @@
 
 2. Launch the 2nd peer on a different port
     ```
-    $ geth --identity "node2" --datadir . --port 30304 --networkid 1114 console 2>> geth.log
+    $ geth --identity "node2" --datadir . --port 30304 --networkid 1114 --rpc --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*" --rpcapi "eth,net,web3,personal,miner" console 2>> geth.log
     ```
 
 3. Join 1st node
@@ -126,8 +126,8 @@
     # Get "enode" infomation of 1st node
     > admin.nodeInfo.enode
 
-    # In 2nd node
-    > admin.addPeer(“enode://dcff6d9dcb14eeb1d1b7575b0653fa1025ad1b7722c6d652d0449f0966e97931bdf037e5542086e7b9e0bec056566522c6c0cc4d73d8e4186a35da8aa5988e15@<main_node_ip>:30303”)
+    # In 2nd node, replace [::] with peer node ip
+    > admin.addPeer("enode://b785a355234033aa6b32a01607ba6afbf96f4446119b5581beb075a9695afb1db9a0d5160e8c16d951eb5834f188b2826e3e7d44f3eaa7c6974962c40b2680fc@[::]:30303?discport=0")
 
     # Verify your nodes are now communicating
     > admin.peers
@@ -156,15 +156,17 @@
     ```
     > var bytecode = "0x<contract_bytecode>"
     > var abi = <contract_abi>
+
+    # Unlock an account before deploying new contract
+    > personal.unlockAccount(eth.coinbase)
+
     > var contract = eth.contract(abi).new(<constructor arguments value>, {from: eth.coinbase, data: bytecode, gas: 2000000})
-    ```
-    Take ERC20 Token contract as example:
-    ```
-    > var contract = eth.contract(abi)
-    > var instance = contract.new(1000000, "CryptoLancer", "CPT", {from: eth.coinbase, data: code, gas: 2000000})
 
     # see the transaction hash
     > instance.transactionHash
+
+    # see the transaction detail
+    > eth.getTransaction(contract.transactionHash)
     ```
 
 4. Mine the transaction
@@ -186,24 +188,25 @@
 You can see the example result:
 ![](pics/getTransactionReceipt.png)
 
-Parameters：
-* `hashString`： String - The transaction hash.
-* `callback`： Function - (optional) Optional callback, returns an error object as first parameter and the result as second.
-
 Returns：
 `Promise` returns `Object` - A transaction receipt object, or null when no receipt was found:
 
 * `status` if the transaction was susccessfull, FALSE, if the EVM reverted the transaction.
-* `blockHash`: String - 32 Bytes，这个交易所在区块的哈希。
-* `blockNumber`: Number - 交易所在区块的块号。
-* `transactionHash`: String - 32 Bytes，交易的哈希值。
+* `blockHash`
+* `blockNumber`
+* `transactionHash`:
 * `from`: String - 20 Bytes, Address of the sender.
 * `to`: String - 20 Bytes, Address of the receiver. null when its a contract creation transaction.
 * `cumulativeGasUsed`: Number - The total amount of gas used when this transaction was executed in the block.
 * `gasUsed`: Number - The amount of gas used by this specific transaction alone.
 * `contractAddress`: String - 20 Bytes, The contract address created, if the transaction was a contract creation, otherwise null.
 * `logs`: Array of log objects, which this transaction generated.
-    * Each log contain a triggered **event**
+    如果有event被觸發，資料就會被入在這
+
+    那什麼時候會需要用到event呢？
+    1. 當作一個額外的儲存空間，而且很便宜。event寫入的成本和用合約變數來儲存的成本相比之下少了很多，如果你開發的dapp需要將使用者的使用紀錄(如付款紀錄)等記錄下來當作證明，與其用一個陣列儲存，不如在每次使用時用event寫進log裡。但要注意的是，這些寫進log裡的資料是沒辦法被合約所存取的。
+
+
 
 
 ## Check the balance of all accounts   
@@ -226,6 +229,7 @@ Returns：
 
 
 ## Connect to Private Network with `truffle`
+Creating a smart contract and deploying it on our private ethereum blockchain
 
 Modify the `truffle.js` file:
 ![](pics/truffle_js.png)
@@ -234,15 +238,33 @@ Modify the `truffle.js` file:
 For each network, if unspecified, transaction options will default to the following values:
 
 **`gas`**: Gas limit used for deploys. Default is 4712388.
+
 **`gasPrice`**: Gas price used for deploys. Default is 100000000000 (100 Shannon).
+
 **`from`**: From address used during migrations. Defaults to the first available account provided by your Ethereum client.
+
 **`provider`**: Default web3 provider using host and port options: new Web3.providers.HttpProvider("http://<host>:<port>")
 
 
-Then, specifying a network during migration
+Then, specifying a network during migration (this will deploy your contract to the network)
+
+Before migration, we have to unlock the account and start mining
 ```
-$ truffle migrate --network pirvate
+> personal.unlockAccount(web3.eth.coinbase)
+> miner.start()
 ```
+
+Then, we can execute
+```
+$ truffle migrate
+```
+
+Check how many Ether you have mined
+```
+web3.fromWei(eth.getBalance(eth.coinbase), "ether")
+```
+
+
 
 ### COMPILING CONTRACTS
 - Location:
