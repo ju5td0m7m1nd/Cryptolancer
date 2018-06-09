@@ -10,7 +10,7 @@ import {
 import Create from "./components/create";
 import Browse from "./components/browse";
 import Issued from "./components/issued";
-import History from "./components/history";
+import Contracted from "./components/contracted";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
 import { CPLInstance } from "../../utils/getContract";
@@ -67,7 +67,10 @@ class Task extends React.Component {
             path={`/dashboard/task/issued`}
             component={() => <Issued CPL={CPL} web3={web3} />}
           />
-          <Route path={`/dashboard/task/history`} component={History} />
+          <Route
+            path={`/dashboard/task/contracted`}
+            component={() => <Contracted CPL={CPL} web3={web3} />}
+          />
           <Route
             path="/dashboard/task/browse/:ipfs"
             component={() => <Detail CPL={CPL} web3={web3} />}

@@ -5,40 +5,14 @@ import ipfs from "../../../../utils/ipfs";
 import firebase from "../../../../utils/firebase";
 /*
   statusId status
-  0        Waiting Talented
-  1        Under Construction
-  2        Reviewing
+  -1       Request rejected
+  0        Waiting for signing
+  1        Work in progress
+  2        Waiting for review
   3        Finished
   4        Denied, select jurors for abritration
   5        Arbitration done
 */
-
-const mockData = [
-  {
-    name: "Frank",
-    status: 0
-  },
-  {
-    name: "Frank",
-    status: 1
-  },
-  {
-    name: "Frank",
-    status: 2
-  },
-  {
-    name: "Frank",
-    status: 3
-  },
-  {
-    name: "Frank",
-    status: 4
-  },
-  {
-    name: "Frank",
-    status: 5
-  }
-];
 
 class Ongoing extends React.Component {
   constructor(props) {
@@ -101,7 +75,9 @@ class Ongoing extends React.Component {
         if (counter === ipfss.length) {
           this.setState({
             validContracts: validContracts.filter(
-              c => c.issuer === web3.eth.accounts[0]
+              c =>
+                c.contractorApplicant.indexOf(web3.eth.accounts[0]) > -1 ||
+                web3.eth.accounts[0] === c.contractor
             ),
             loading: false
           });
@@ -115,7 +91,6 @@ class Ongoing extends React.Component {
   render() {
     const { validContracts } = this.state;
     const { CPL, web3 } = this.props;
-    console.log(validContracts);
     return (
       <div>
         {validContracts.map((d, key) =>

@@ -45,11 +45,11 @@ class Navbar extends React.Component {
           ISSUED
         </NavItem>
         <NavItem
-          activate={section === "history"}
+          activate={section === "contracted"}
           color={color}
-          onClick={() => route("/dashboard/task/history")}
+          onClick={() => route("/dashboard/task/contracted")}
         >
-          HISTORY
+          CONTRACTED
         </NavItem>
       </Nav>
     );

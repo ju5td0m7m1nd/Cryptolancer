@@ -1,7 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import Applicant from "./Applicant";
-import ReviewForm from "./ReviewForm";
 
 const Container = styled.div`
   width: 100%;
@@ -88,20 +86,12 @@ class StatusContainer extends React.Component {
     const { contract, web3, CPL } = this.props;
     switch (contract.status) {
       case 0:
-        return contract.contractorApplicant.map((address, key) =>
-          <Applicant
-            address={address}
-            key={key}
-            ipfs={contract.ipfs}
-            web3={web3}
-            CPL={CPL}
-          />
-        );
+        return <Description>Text</Description>;
         break;
       case 1:
-        return <Description>Waiting for submit</Description>;
+        return <Description>Waiting for submit.</Description>;
       case 2:
-        return <ReviewForm />;
+        return <Description>Text</Description>;
       case 3:
         return <Description>Text</Description>;
       case 4:
