@@ -39,14 +39,32 @@ const LogoBox= styled.div`
   justify-content: flex-start;
   flex-direction: row;
 `;
-
 const FutureBox= styled.div`
   width: 120%;
   display: flex;
   align-items: center;
+  flex-direction: column;
+  background-image: linear-gradient(271deg, #0f69e6, #c1dbff);
+`;
+
+const Section_0= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: row;
-  margin-top: 30px;
-  margin-left:10%;
+  margin-top: 100px;
+  margin-bottom: 100px;
+`;
+const Future_word= styled.div`
+  width: 20%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 200px;
 `;
 const Section_1= styled.div`
   width: 80%;
@@ -58,13 +76,13 @@ const Section_1= styled.div`
   margin-top: 40px;
 `;
 const Context= styled.div`
-  width: 80%;
+  width: 90%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  margin-bottom: 20px;
+  margin-bottom: 35px;
 `;
 const Arror= styled.div`
   width: 80%;
@@ -83,7 +101,7 @@ const Section_2= styled.div`
   align-items: flex-end;
   justify-content: center;
   flex-direction: row;
-  margin-top: 510px;
+  margin-top: 310px;
 `;
 
 const StepBox= styled.div`
@@ -91,7 +109,7 @@ const StepBox= styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-top: 200px;
+  margin-top: 100px;
   margin-left:10%;
   -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
@@ -99,22 +117,22 @@ const StepBox= styled.div`
 `;
 
 const SmallPic_Left= styled.div`
-  width: 60%;
+  width: 70%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-direction: row;
-  margin-bottom: 90px;
+  margin-bottom: 100px;
 `;
 const SmallPic_Right= styled.div`
-  width: 60%;
+  width: 70%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-direction: row;
-  margin-bottom: 90px;
+  margin-bottom: 100px;
 `;
 const compensate_color= styled.div`
   flex-wrap: nowrap;
@@ -143,7 +161,7 @@ const Section_3= styled.div`
 
 `;
 const Ball= styled.div`
-  width: 80%;
+  width: 95%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -161,7 +179,7 @@ const Section_4= styled.div`
   margin-bottom: 110px;
 `;
 const Pie= styled.div`
-  width: 100%;
+  width: 90%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -187,7 +205,7 @@ const Section_5= styled.div`
   flex-direction: row;
   margin-bottom: 110px;
 `;
-const Person_Middle= styled.div`
+const Person= styled.div`
   width: 100%;
   flex-wrap: nowrap;
   display: flex;
@@ -196,6 +214,14 @@ const Person_Middle= styled.div`
   flex-direction: row;
 `;
 
+const Person_Mid= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+`;
 const Person_Left= styled.div`
   width: 80%;
   flex-wrap: nowrap;
@@ -238,9 +264,23 @@ const BioContext_Mid_2= styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 50px;
 `;
+const Future = styled.div`
+    width: 773px;
+    height: 135px;
+    font-family: Raleway;
+    font-size: 24px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.21;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+`;
+
 const Style_01 = styled.button`
 
     margin-right:4%;
@@ -423,10 +463,14 @@ class App extends Component {
                     <Style_01 > CL TOKEN </Style_01>
                     <Style_01 > TEAM </Style_01>
                     <img style={{width:'200px',height:'55px'}}src={require('../public/images/icons/pic/WhitePageBtn.png')} />
-                </TitleBox>
-                   
-                <FutureBox>                                                   
-                <img style={{width:'115%',height:'921.4px',backgroundimage:'linear-gradient(271deg, #0f69e6, #c1dbff)'}} src={require('../public/images/icons/pic/Group126.png')} />
+                </TitleBox>                                            
+                <FutureBox>                                                                                                                     
+                <Section_0>                                                   
+                    <Style_05> The future of freelancing </Style_05> 
+                </Section_0>
+                <Future_word>
+                    <Future> Crypolancer ecosystem make it more secure and promising. </Future>                                                
+                </Future_word>                                                   
                 </FutureBox>
                                                                                                                                                                                                                                                             
                 <Section_1 > 
@@ -456,16 +500,16 @@ class App extends Component {
                 </Section_2 >                                                                        
                 <StepBox>                                                                        
                 <SmallPic_Left>
-                          <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Contract.png')} />
+                          <img  src={require('../public/images/icons/pic/Contract.png')} />
                 </SmallPic_Left>
                 <SmallPic_Right>                                                           
-                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Security.png')} />
+                <img  src={require('../public/images/icons/pic/Security.png')} />
                 </SmallPic_Right>
                 <SmallPic_Left>                                                 
-                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Automation.png')}/>
+                <img  src={require('../public/images/icons/pic/Automation.png')}/>
                 </SmallPic_Left>
                 <SmallPic_Right>                                                 
-                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Arbitration.png')}/>
+                <img  src={require('../public/images/icons/pic/Arbitration.png')}/>
                 </SmallPic_Right>                                              
                 </StepBox>                                                                                                
 
@@ -477,7 +521,7 @@ class App extends Component {
                     <Style_05 > Cryptolancer Ecosystem </Style_05>
                 </Section_3>
                 <Ball>
-                     <img style={{width:'80%',height:'1000.9px'}} src={require('../public/images/icons/pic/Group125.png')} />                                              
+                     <img src={require('../public/images/icons/pic/Group125.png')} />                                              
                 </Ball>                                                                                         
                 </BlueBox>                                                                    
                 
@@ -485,7 +529,7 @@ class App extends Component {
                 <Style_02 > CL Token</Style_02>
                 </Section_4> 
                 <pie>                                                       
-                <img src={require('../public/images/icons/pic/Group120.png')} />
+                    <img src={require('../public/images/icons/pic/Group120.png')} />
                 </pie>                                                                                              
                  
 
@@ -493,30 +537,34 @@ class App extends Component {
                     <Section_5>
                         <Style_05>  Team </Style_05>
                     </Section_5>
-                    <Person_Middle>         
+                    <Person>         
                     <Person_Left>
                     <img src={require('../public/images/icons/pic/Frank.png')} />          
                     </Person_Left> 
-                    <img style={{width:'20%',height:'360px'}}src={require('../public/images/icons/pic/Joann.png')} />
+                    <Person_Mid>          
+                    <img src={require('../public/images/icons/pic/Joann.png')} />
+                    </Person_Mid>
                     <Person_Right>
                     <img src={require('../public/images/icons/pic/Jack.png')} />                                               
                     </Person_Right> 
-                    </Person_Middle>
+                    </Person>
 
-                    <Person_Middle>         
+                    <Person>         
                     <Person_Left>
                             <BioContext>          
                             <Style_05 > Frank Tasi </Style_05>
                             <Biography >● FRISMO co-founder & CTO Medium writer </Biography>                                      
                             <Biography >● Computer Science B.S. </Biography>
                             </BioContext>                                                                   
-                    </Person_Left> 
+                    </Person_Left>
+                    <Person_Mid>
                             <BioContext_Mid>          
                             <Style_05 > Joann Chang </Style_05>
                             <Biography >● Computer Science M.S.  </Biography>                                      
                             <Biography >● Computer Science B.S. </Biography>
                             <Biography >● Lite-on Corp. Intern </Biography>
                             </BioContext_Mid> 
+                    </Person_Mid>
                     <Person_Right>
                             <BioContext>          
                             <Style_05 > Jack Yu </Style_05>
@@ -524,31 +572,35 @@ class App extends Component {
                             <Biography >● Computer Science B.S. </Biography>
                             </BioContext>                                                                             
                     </Person_Right>                                               
-                    </Person_Middle>
+                    </Person>
 
-                    <Person_Middle>         
+                    <Person>         
                     <Person_Left>
                     <img src={require('../public/images/icons/pic/Sabrina.png')} />          
-                    </Person_Left> 
-                    <img style={{width:'20%',height:'360px'}}src={require('../public/images/icons/pic/Michael.png')} />
+                    </Person_Left>
+                    <Person_Mid>
+                    <img src={require('../public/images/icons/pic/Michael.png')} />
+                    </Person_Mid>                                              
                     <Person_Right>
                     <img src={require('../public/images/icons/pic/Dean.png')} />                                               
                     </Person_Right> 
-                    </Person_Middle>
+                    </Person>
 
-                    <Person_Middle>         
+                    <Person>         
                     <Person_Left>
                             <BioContext>          
                             <Style_05 > Sabrina Kuo </Style_05>
                             <Biography >● Computer Science M.S. </Biography>                                      
                             <Biography >● Computer Science B.S. </Biography>
                             </BioContext>                                                                   
-                    </Person_Left> 
+                    </Person_Left>
+                    <Person_Mid>
                             <BioContext_Mid_2>          
                             <Style_05 > Michael Liu </Style_05>
                             <Biography >● Computer Science M.S.  </Biography>                                      
                             <Biography >● Electrical Engineer and Computer Science B.S. </Biography>
-                            </BioContext_Mid_2> 
+                            </BioContext_Mid_2>
+                    </Person_Mid>
                     <Person_Right>
                             <BioContext>          
                             <Style_05 > Dean Lai </Style_05>
@@ -556,7 +608,7 @@ class App extends Component {
                             <Biography >● Bio-technology B.S. </Biography>                   
                             </BioContext>                                                                             
                     </Person_Right>                                               
-                    </Person_Middle>
+                    </Person>
                 </TeamBox>                                                                                                  
           </Container>
         </Switch>
