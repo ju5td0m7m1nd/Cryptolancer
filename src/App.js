@@ -40,11 +40,12 @@ const LogoBox= styled.div`
   flex-direction: row;
 `;
 const FutureBox= styled.div`
-  width: 120%;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
-  background-image: linear-gradient(271deg, #0f69e6, #c1dbff);
+  margin-bottom: 200px;
 `;
 
 const Section_0= styled.div`
@@ -58,7 +59,7 @@ const Section_0= styled.div`
   margin-bottom: 100px;
 `;
 const Future_word= styled.div`
-  width: 20%;
+  width: 30%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -101,11 +102,10 @@ const Section_2= styled.div`
   align-items: flex-end;
   justify-content: center;
   flex-direction: row;
-  margin-top: 310px;
 `;
 
 const StepBox= styled.div`
-  width: 120%;
+  width: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -117,7 +117,7 @@ const StepBox= styled.div`
 `;
 
 const SmallPic_Left= styled.div`
-  width: 70%;
+  width: 75%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -126,7 +126,7 @@ const SmallPic_Left= styled.div`
   margin-bottom: 100px;
 `;
 const SmallPic_Right= styled.div`
-  width: 70%;
+  width: 75%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -143,7 +143,7 @@ const compensate_color= styled.div`
   margin-bottom: 500px;
 `;
 const BlueBox= styled.div`
-  width: 120%;
+  width: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -161,7 +161,7 @@ const Section_3= styled.div`
 
 `;
 const Ball= styled.div`
-  width: 95%;
+  width: 90%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
@@ -179,10 +179,10 @@ const Section_4= styled.div`
   margin-bottom: 110px;
 `;
 const Pie= styled.div`
-  width: 90%;
+  width: 85%;
   flex-wrap: nowrap;
   display: flex;
-  align-items: center;
+  align-items: flex-right;
   justify-content: center;
   flex-direction: row;
   margin-top: 110px;  
@@ -215,48 +215,55 @@ const Person= styled.div`
 `;
 
 const Person_Mid= styled.div`
-  width: 80%;
+  width: 30%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
 `;
 const Person_Left= styled.div`
-  width: 80%;
+  width: 30%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
 `;
 
 const Person_Right= styled.div`
-  width: 80%;
+  width: 30%;
   flex-wrap: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
 
 `;
-const BioContext= styled.div`
-  width: 100%;
+const BioContext_Left= styled.div`
+  display: flex;
+  align-items: flow-end;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 5px;
+`;
+
+const BioContext_Right= styled.div`
+ 
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  margin-bottom: 50px;
+  flex-direction: row;
+  margin-bottom: 5px;
 `;
 
 const BioContext_Mid= styled.div`
-  width: 20%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  margin-top: 70px;
-  margin-bottom: 50px;
+  flex-direction: row;
+  margin-bottom: 5px;
 `;
 const BioContext_Mid_2= styled.div`
   width: 20%;
@@ -281,7 +288,7 @@ const Future = styled.div`
     color: #ffffff;
 `;
 
-const Style_01 = styled.button`
+const Meau = styled.button`
 
     margin-right:4%;
     border: 0px;
@@ -298,7 +305,7 @@ const Style_01 = styled.button`
     background-color: transparent;
 `;
 
-const Style_02 = styled.div`
+const Title_Grayword = styled.div`
     width: 246px;
     height: 48px;
     font-family: Raleway;
@@ -312,7 +319,7 @@ const Style_02 = styled.div`
     color: #707070;
     -webkit-text-stroke: 3px #707070;
 `;
-const Style_03 = styled.div`
+const Context_Word = styled.div`
     width: 1540px;
     height: 10px;
     font-family: HelveticaNeue;
@@ -325,7 +332,7 @@ const Style_03 = styled.div`
     text-align: center;
     color: #707070;
 `;
-const Style_04 = styled.div`
+const Title_Blueword = styled.div`
     width: 368px;
     height: 48px;
     font-family: Raleway;
@@ -354,7 +361,7 @@ const Floating = styled.div`
     -webkit-text-stroke: 10px #dae6fa;
 `;
 
-const Style_05 = styled.div`
+const Title_Whiteword = styled.div`
     width: 720px;
     height: 48px;
     font-family: Raleway;
@@ -370,20 +377,34 @@ const Style_05 = styled.div`
     margin-bottom: 15px;
 `;
 
-
-const Biography = styled.div`
-    width: 400px;
-    height: 64px;
+const Bio_name = styled.div`
+    width: 720px;
+    height: 48;
     font-family: Raleway;
-    font-size: 32px;
+    font-size: 30px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.21;
+    letter-spacing: normal;
+    text-align: center;
+    color: #eae8e8;
+    -webkit-text-stroke: 3px #eae8e8;
+    margin-bottom: 10px;
+`;
+const Bio_context = styled.div`
+    width: 400px;
+    height: 54;
+    font-family: Raleway;
+    font-size: 22px;
     font-weight: 500;
     font-style: normal;
     font-stretch: normal;
     line-height: 1.19;
     letter-spacing: normal;
-    text-align: left;
+    text-align:center;
     color: #f0f0f2;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 `;
 
 
@@ -459,14 +480,15 @@ class App extends Component {
                     <LogoBox>
                        <img src={require('../public/images/icons/logo_purple.png')} />
                     </LogoBox>
-                    <Style_01 > HOW IT WORKS </Style_01>
-                    <Style_01 > CL TOKEN </Style_01>
-                    <Style_01 > TEAM </Style_01>
+                    <Meau > HOW IT WORKS </Meau>
+                    <Meau > CL TOKEN </Meau>
+                    <Meau > TEAM </Meau>
                     <img style={{width:'200px',height:'55px'}}src={require('../public/images/icons/pic/WhitePageBtn.png')} />
                 </TitleBox>                                            
-                <FutureBox>                                                                                                                     
+                <FutureBox style={{position: 'relative'}}>
+                      <img style={{left:'1%',position: 'absolute',top:'0',zIndex:'-1'}} src={require('../public/images/icons/pic/blue_ground.png')} />                                             
                 <Section_0>                                                   
-                    <Style_05> The future of freelancing </Style_05> 
+                    <Title_Whiteword> The future of freelancing </Title_Whiteword> 
                 </Section_0>
                 <Future_word>
                     <Future> Crypolancer ecosystem make it more secure and promising. </Future>                                                
@@ -474,29 +496,30 @@ class App extends Component {
                 </FutureBox>
                                                                                                                                                                                                                                                             
                 <Section_1 > 
-                          <Style_02 > SOLUTION</Style_02> 
+                          <Title_Grayword > SOLUTION</Title_Grayword> 
                 </Section_1>
                 <Arror>                                                                                                              
-                          <img style={{width:'5.7%',height:'89px',opacity:'0.72'}} src={require('../public/images/icons/pic/Arrow.png')} />
+                          <img src={require('../public/images/icons/pic/Arrow.png')} />
                 </Arror> 
                 <Context>                                                                            
-                          <Style_03 > Cryptolancer provides a blockchain-based ecosystem to protect both outsourcing company and freelancer. </Style_03>
+                          <Context_Word > Cryptolancer provides a blockchain-based ecosystem to protect both outsourcing company and freelancer. </Context_Word>
                 </Context>
                 <Context>                                                                        
-                          <Style_03 > We'll lock and secure the project information once the smart contract is signed. The contract will</Style_03>
+                          <Context_Word > We'll lock and secure the project information once the smart contract is signed. The contract will</Context_Word>
                 </Context>
                 <Context>                                                                        
-                          <Style_03 > executed automatically on the delivery date. If there is a dispute between company and freelancer,</Style_03>
+                          <Context_Word > executed automatically on the delivery date. If there is a dispute between company and freelancer,</Context_Word>
                 </Context> 
                 <Context>                                                                        
-                          <Style_03 > jurors on the network will evaluate evidence and cast their vote.</Style_03>
+                          <Context_Word > jurors on the network will evaluate evidence and cast their vote.</Context_Word>
                 </Context> 
                 <Context>                                                                        
-                          <Style_03 > and the decision is enforced by the smart contract.</Style_03>                                                                        
+                          <Context_Word > and the decision is enforced by the smart contract.</Context_Word>                                                                        
                 </Context>                                                                                                             
                 
-                <Section_2 >                                                                      
-                <Style_04 > HOW IT WORKS</Style_04>
+                <Section_2 >
+                              
+                <Title_Blueword > HOW IT WORKS</Title_Blueword>
                 </Section_2 >                                                                        
                 <StepBox>                                                                        
                 <SmallPic_Left>
@@ -518,7 +541,7 @@ class App extends Component {
                 <div>.</div>                                               
                 </compensate_color>                                                
                 <Section_3>                                              
-                    <Style_05 > Cryptolancer Ecosystem </Style_05>
+                    <Title_Whiteword > Cryptolancer Ecosystem </Title_Whiteword>
                 </Section_3>
                 <Ball>
                      <img src={require('../public/images/icons/pic/Group125.png')} />                                              
@@ -526,7 +549,7 @@ class App extends Component {
                 </BlueBox>                                                                    
                 
                 <Section_4>                                                      
-                <Style_02 > CL Token</Style_02>
+                <Title_Grayword > CL Token</Title_Grayword>
                 </Section_4> 
                 <pie>                                                       
                     <img src={require('../public/images/icons/pic/Group120.png')} />
@@ -535,80 +558,53 @@ class App extends Component {
 
                 <TeamBox>
                     <Section_5>
-                        <Style_05>  Team </Style_05>
+                        <Title_Whiteword>  Team </Title_Whiteword>
                     </Section_5>
                     <Person>         
                     <Person_Left>
-                    <img src={require('../public/images/icons/pic/Frank.png')} />          
+                    <img src={require('../public/images/icons/pic/Frank.png')} />
+                    <Bio_name > Frank Tasi </Bio_name>                        
+                    <Bio_context >● FRISMO co-founder & CTO Medium writer </Bio_context>                             
+                    <Bio_context >● Computer Science B.S. </Bio_context>
                     </Person_Left> 
                     <Person_Mid>          
                     <img src={require('../public/images/icons/pic/Joann.png')} />
+                    <Bio_name > Joann Chang </Bio_name>                            
+                    <Bio_context >● Computer Science M.S.  </Bio_context>                              
+                    <Bio_context >● Computer Science B.S. </Bio_context>                            
+                    <Bio_context >● Lite-on Corp. Intern </Bio_context>
                     </Person_Mid>
                     <Person_Right>
-                    <img src={require('../public/images/icons/pic/Jack.png')} />                                               
+                    <img src={require('../public/images/icons/pic/Jack.png')} />
+                    <Bio_name > Jack Yu </Bio_name>                            
+                    <Bio_context >● Computer Science M.S. </Bio_context>                             
+                    <Bio_context >● Computer Science B.S. </Bio_context>
                     </Person_Right> 
                     </Person>
 
-                    <Person>         
-                    <Person_Left>
-                            <BioContext>          
-                            <Style_05 > Frank Tasi </Style_05>
-                            <Biography >● FRISMO co-founder & CTO Medium writer </Biography>                                      
-                            <Biography >● Computer Science B.S. </Biography>
-                            </BioContext>                                                                   
-                    </Person_Left>
-                    <Person_Mid>
-                            <BioContext_Mid>          
-                            <Style_05 > Joann Chang </Style_05>
-                            <Biography >● Computer Science M.S.  </Biography>                                      
-                            <Biography >● Computer Science B.S. </Biography>
-                            <Biography >● Lite-on Corp. Intern </Biography>
-                            </BioContext_Mid> 
-                    </Person_Mid>
-                    <Person_Right>
-                            <BioContext>          
-                            <Style_05 > Jack Yu </Style_05>
-                            <Biography >● Computer Science M.S. </Biography>                                      
-                            <Biography >● Computer Science B.S. </Biography>
-                            </BioContext>                                                                             
-                    </Person_Right>                                               
-                    </Person>
+           
 
                     <Person>         
                     <Person_Left>
-                    <img src={require('../public/images/icons/pic/Sabrina.png')} />          
+                    <img src={require('../public/images/icons/pic/Sabrina.png')} /> 
+                    <Bio_name > Sabrina Kuo </Bio_name>
+                    <Bio_context >● Computer Science M.S. </Bio_context>                                      
+                    <Bio_context >● Computer Science B.S. </Bio_context>
                     </Person_Left>
                     <Person_Mid>
                     <img src={require('../public/images/icons/pic/Michael.png')} />
+                    <Bio_name > Michael Liu </Bio_name>
+                    <Bio_context >● Computer Science M.S.  </Bio_context>                                      
+                    <Bio_context >● Electrical Engineer and Computer Science B.S. </Bio_context>          
                     </Person_Mid>                                              
                     <Person_Right>
-                    <img src={require('../public/images/icons/pic/Dean.png')} />                                               
+                    <img src={require('../public/images/icons/pic/Dean.png')} />
+                    <Bio_name > Dean Lai </Bio_name>
+                    <Bio_context >● Computer Science M.S. </Bio_context>                                      
+                    <Bio_context >● Bio-technology B.S. </Bio_context>
                     </Person_Right> 
                     </Person>
 
-                    <Person>         
-                    <Person_Left>
-                            <BioContext>          
-                            <Style_05 > Sabrina Kuo </Style_05>
-                            <Biography >● Computer Science M.S. </Biography>                                      
-                            <Biography >● Computer Science B.S. </Biography>
-                            </BioContext>                                                                   
-                    </Person_Left>
-                    <Person_Mid>
-                            <BioContext_Mid_2>          
-                            <Style_05 > Michael Liu </Style_05>
-                            <Biography >● Computer Science M.S.  </Biography>                                      
-                            <Biography >● Electrical Engineer and Computer Science B.S. </Biography>
-                            </BioContext_Mid_2>
-                    </Person_Mid>
-                    <Person_Right>
-                            <BioContext>          
-                            <Style_05 > Dean Lai </Style_05>
-                            <Biography >● Computer Science M.S. </Biography>                                      
-                            <Biography >● Bio-technology B.S. </Biography>                   
-                            </BioContext>                                                                             
-                    </Person_Right>                                               
-                    </Person>
                 </TeamBox>                                                                                                  
           </Container>
         </Switch>
