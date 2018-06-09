@@ -250,7 +250,10 @@ class Form extends React.Component {
       detailspec,
       description,
       status: 0,
-      applicant: [],
+      issuer: web3.eth.accounts[0],
+      contractor: null,
+      contractorApplicant: [],
+      jurorApplicant: [],
       selectedNumber: [],
       finalResult: []
     };

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
-import ipfs from "../../../../utils/ipfs";
+import ipfs, { readIPFS, createIPFS } from "../../../../utils/ipfs";
 import Button from "../../../../components/Button";
 
 const Container = styled.section`
@@ -147,37 +147,48 @@ class Detail extends React.Component {
     super(props);
     this.state = {
       task: [],
-      loading: true
+      loading: true,
+      applied: false
     };
   }
-  componentDidMount() {
-    ipfs.files.cat(this.props.match.params.ipfs, (err, res) => {
-      if (!err) {
-        const IPFS_DATA = res.toString();
-        //load IPFS to web
-        const content = JSON.parse(IPFS_DATA);
-        if (content.status === 0) {
-          this.setState({
-            task: this.state.task.concat(content),
-            loading: false
-          });
-        }
-      } else {
-        console.log(err);
+  async componentDidMount() {
+    try {
+      const data = await readIPFS(this.props.match.params.ipfs);
+      if (data.status === 0) {
+        this.setState({
+          task: this.state.task.concat(data),
+          loading: false
+        });
       }
-    });
+    } catch (e) {
+      console.log(e);
+    }
   }
-  render() {
-    const {
-      name,
-      description,
-      skills,
-      budget,
-      startDate,
-      endDate,
-      spec
-    } = mockData;
+
+  _apply = async () => {
+    const { web3, CPL } = this.props;
     const { task } = this.state;
+    const newPayload = Object.assign({}, task[0], {
+      contractorApplicant: task[0].contractorApplicant.concat(
+        web3.eth.accounts[0]
+      )
+    });
+    const newIPFSHash = await createIPFS(newPayload);
+    await CPL.updateContractFromApplicant(
+      this.props.match.params.ipfs,
+      newIPFSHash,
+      task[0].issuer,
+      {
+        from: web3.eth.accounts[0],
+        gas: 3000000
+      }
+    );
+    this.setState({ applied: true });
+  };
+
+  render() {
+    const { task, applied } = this.state;
+    const { web3 } = this.props;
     return (
       <Container>
         <BackBtn
@@ -185,7 +196,7 @@ class Detail extends React.Component {
         >
           {"< Back to Browse"}
         </BackBtn>
-        {task.length > 0
+        {task.length > 0 && !applied
           ? <div
               style={{
                 padding: "0px 0px 32px"
@@ -231,18 +242,23 @@ class Detail extends React.Component {
                   </Spec>
                 )}
               </SectionBlock>
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  alignItems: "center"
-                }}
-              >
-                <Button text="Apply" />
-              </div>
+              {web3
+                ? web3.eth.accounts[0] !== task[0].issuer
+                  ? <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Button text="Apply" onClick={this._apply} />
+                    </div>
+                  : null
+                : null}
             </div>
           : null}
+        {applied ? <h2>Your application is under processing.</h2> : null}
       </Container>
     );
   }

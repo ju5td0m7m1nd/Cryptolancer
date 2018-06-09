@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import Create from "./components/create";
 import Browse from "./components/browse";
-import Ongoing from "./components/ongoing";
+import Issued from "./components/issued";
 import History from "./components/history";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
@@ -63,9 +63,15 @@ class Task extends React.Component {
             path={`/dashboard/task/create`}
             component={() => <Create CPL={CPL} web3={web3} />}
           />
-          <Route path={`/dashboard/task/ongoing`} component={Ongoing} />
+          <Route
+            path={`/dashboard/task/issued`}
+            component={() => <Issued CPL={CPL} web3={web3} />}
+          />
           <Route path={`/dashboard/task/history`} component={History} />
-          <Route path="/dashboard/task/browse/:ipfs" component={Detail} />
+          <Route
+            path="/dashboard/task/browse/:ipfs"
+            component={() => <Detail CPL={CPL} web3={web3} />}
+          />
         </Switch>
       </Container>
     );

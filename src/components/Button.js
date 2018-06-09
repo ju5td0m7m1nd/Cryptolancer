@@ -18,7 +18,7 @@ export default class Button extends React.Component {
   }
   render() {
     return (
-      <Container onClick={this.props.onClick}>
+      <Container onClick={this.props.onClick} style={this.props.style}>
         {this.props.text}
       </Container>
     );
