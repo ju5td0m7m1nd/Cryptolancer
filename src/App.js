@@ -16,7 +16,234 @@ import "./css/pure-min.css";
 import "./App.css";
 
 // The word
+const Container = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+`;
+const TitleBox= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
+  margin-top: 40px;
+`;
+const LogoBox= styled.div`
+  width: 55%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  flex-direction: row;
+`;
+
+const FutureBox= styled.div`
+  width: 120%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 30px;
+  margin-left:10%;
+`;
+const Section_1= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 40px;
+`;
+const Context= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 20px;
+`;
+const Arror= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 30px;
+  margin-bottom: 30px;
+`;
+const Section_2= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 510px;
+`;
+
+const StepBox= styled.div`
+  width: 120%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 200px;
+  margin-left:10%;
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  background-color: #dbeaff;
+`;
+
+const SmallPic_Left= styled.div`
+  width: 60%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  margin-bottom: 90px;
+`;
+const SmallPic_Right= styled.div`
+  width: 60%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
+  margin-bottom: 90px;
+`;
+const compensate_color= styled.div`
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  margin-bottom: 500px;
+`;
+const BlueBox= styled.div`
+  width: 120%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-left:10%;
+  background-image: linear-gradient(to left, #195eba, #07244a);
+`;
+
+const Section_3= styled.div`
+  width: 100%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-direction: row;
+
+`;
+const Ball= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 90px;
+`;
+const Section_4= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 110px;
+`;
+const Pie= styled.div`
+  width: 100%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 110px;  
+`;
+
+const TeamBox= styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 410px;
+  background-image: linear-gradient(91deg, #2b80f8, #accefd 38%, #1b76f7);
+`;
+const Section_5= styled.div`
+  width: 100%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 110px;
+`;
+const Person_Middle= styled.div`
+  width: 100%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+`;
+
+const Person_Left= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+`;
+
+const Person_Right= styled.div`
+  width: 80%;
+  flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+
+`;
+const BioContext= styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 50px;
+`;
+
+const BioContext_Mid= styled.div`
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 70px;
+  margin-bottom: 50px;
+`;
+const BioContext_Mid_2= styled.div`
+  width: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 30px;
+  margin-bottom: 50px;
+`;
 const Style_01 = styled.button`
+
+    margin-right:4%;
     border: 0px;
     outline: none;
     font-family: Raleway;
@@ -100,6 +327,7 @@ const Style_05 = styled.div`
     text-align: center;
     color: #eae8e8;
     -webkit-text-stroke: 3px #eae8e8;
+    margin-bottom: 15px;
 `;
 
 
@@ -113,15 +341,9 @@ const Biography = styled.div`
     font-stretch: normal;
     line-height: 1.19;
     letter-spacing: normal;
-    text-align: center;
+    text-align: left;
     color: #f0f0f2;
-`;
-const Rectangle_40 = styled.div`
-  width: 226px;
-  height: 65px;
-  border-radius: 40px;
-  background-color: #ffffff;
-  border: solid 4px #6610f2;
+    margin-bottom: 20px;
 `;
 
 
@@ -192,73 +414,151 @@ class App extends Component {
       <Router>
         <Switch>
           <Route path="/dashboard" component={Dashboard} />
-          <div style={{width:'1752px',height:'9678px'}}>
-             <script src="./java.js"></script>
-                <img style={{left:'6.5%',position:'absolute',top:'70px'}} src={require('../public/images/icons/logo_purple.png')} />
-                <Style_01 style={{left:'55.2%', position: 'absolute', top: '60px'}} > HOW IT WORKS </Style_01>
-                <Style_01 style={{left:'66%', position: 'absolute', top: '60px'}}> CL TOKEN </Style_01>
-                <Style_01 style={{left:'74.86%', position: 'absolute', top: '60px'}}> TEAM </Style_01>
-                <Rectangle_40 style={{left:'81.86%', position: 'absolute', top: '38px'}}></Rectangle_40>
-                <Style_01 style={{left:'83.6%', position: 'absolute', top: '60px'}}> WHITE PAPER </Style_01>
-                <img style={{top:'146.5px',position:'absolute',width:'115%',height:'921.4px',backgroundimage:'linear-gradient(271deg, #0f69e6, #c1dbff)'}} src={require('../public/images/icons/pic/Group126.png')} />
-                <img style={{left:'43%',top:'1280px',position:'absolute',width:'89px',height:'89px',opacity:'0.72'}} src={require('../public/images/icons/pic/Arrow.png')} />
-                <Style_02 style={{left:'39.6%', position: 'absolute', top: '1188px'}}> SOLUTION</Style_02>
-                <Style_03 style={{left:'6.7%', position: 'absolute', top: '1443px'}}> Cryptolancer provides a blockchain-based ecosystem to protect both outsourcing company and freelancer. </Style_03>
-                <Style_03 style={{left:'9.7%', position: 'absolute', top: '1513px'}}> We'll lock and secure the project information once the smart contract is signed. The contract will</Style_03>
-                <Style_03 style={{left:'9.4%', position: 'absolute', top: '1583px'}}> executed automatically on the delivery date. If there is a dispute between company and freelancer,</Style_03>
-                <Style_03 style={{left:'6.3%', position: 'absolute', top: '1653px'}}> jurors on the network will evaluate evidence and cast their vote.</Style_03>
-                <Style_03 style={{left:'5.3%', position: 'absolute', top: '1723px'}}> and the decision is enforced by the smart contract.</Style_03>
-
-
-                <Style_04 style={{left:'37.6%', position: 'absolute', top: '2099px'}}> HOW IT WORKS</Style_04>                            
-                <img style={{top:'2380px',position:'absolute',width:'105%',height:'2291.4px',webkitbackdropfilter:'blur(30px)',backdropfilter:'blur(30px)',
-  backgroundcolor:'#dbeaff'}} src={require('../public/images/icons/pic/Path113.png')} /> 
-                <img style={{left:'22%',position:'absolute',top:'2442px',width:'332px',height:'272px'}} src={require('../public/images/icons/pic/Contract.png')} />               
-                <img style={{left:'62.79%',position:'absolute',top:'2944px',width:'342px',height:'272px'}} src={require('../public/images/icons/pic/Security.png')} />
-                <img style={{left:'23.3%',position:'absolute',top:'3450px',width:'342px',height:'272px'}} src={require('../public/images/icons/pic/Automation.png')}/>
-                <img style={{left:'64.3%',position:'absolute',top:'3920px',width:'342px',height:'272px'}} src={require('../public/images/icons/pic/Arbitration.png')}/>
-
+             <Container>
+                <TitleBox >
+                    <LogoBox>
+                       <img src={require('../public/images/icons/logo_purple.png')} />
+                    </LogoBox>
+                    <Style_01 > HOW IT WORKS </Style_01>
+                    <Style_01 > CL TOKEN </Style_01>
+                    <Style_01 > TEAM </Style_01>
+                    <img style={{width:'200px',height:'55px'}}src={require('../public/images/icons/pic/WhitePageBtn.png')} />
+                </TitleBox>
+                   
+                <FutureBox>                                                   
+                <img style={{width:'115%',height:'921.4px',backgroundimage:'linear-gradient(271deg, #0f69e6, #c1dbff)'}} src={require('../public/images/icons/pic/Group126.png')} />
+                </FutureBox>
+                                                                                                                                                                                                                                                            
+                <Section_1 > 
+                          <Style_02 > SOLUTION</Style_02> 
+                </Section_1>
+                <Arror>                                                                                                              
+                          <img style={{width:'5.7%',height:'89px',opacity:'0.72'}} src={require('../public/images/icons/pic/Arrow.png')} />
+                </Arror> 
+                <Context>                                                                            
+                          <Style_03 > Cryptolancer provides a blockchain-based ecosystem to protect both outsourcing company and freelancer. </Style_03>
+                </Context>
+                <Context>                                                                        
+                          <Style_03 > We'll lock and secure the project information once the smart contract is signed. The contract will</Style_03>
+                </Context>
+                <Context>                                                                        
+                          <Style_03 > executed automatically on the delivery date. If there is a dispute between company and freelancer,</Style_03>
+                </Context> 
+                <Context>                                                                        
+                          <Style_03 > jurors on the network will evaluate evidence and cast their vote.</Style_03>
+                </Context> 
+                <Context>                                                                        
+                          <Style_03 > and the decision is enforced by the smart contract.</Style_03>                                                                        
+                </Context>                                                                                                             
                 
-                <img style={{right:'1%',top:'4627.1px',position:'absolute',width:'105%',height:'1677.9px',backgroundimage:'linear-gradient(to left, #195eba, #07244a)'}} src={require('../public/images/icons/pic/Path115.png')} />
-                <img style={{left:'10%',top:'4911.1px',position:'absolute',width:'75%',height:'1000.9px'}} src={require('../public/images/icons/pic/Group125.png')} />
-                <Style_05 style={{left:'28.8%', position: 'absolute', top: '4706px'}}> Cryptolancer Ecosystem </Style_05>
+                <Section_2 >                                                                      
+                <Style_04 > HOW IT WORKS</Style_04>
+                </Section_2 >                                                                        
+                <StepBox>                                                                        
+                <SmallPic_Left>
+                          <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Contract.png')} />
+                </SmallPic_Left>
+                <SmallPic_Right>                                                           
+                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Security.png')} />
+                </SmallPic_Right>
+                <SmallPic_Left>                                                 
+                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Automation.png')}/>
+                </SmallPic_Left>
+                <SmallPic_Right>                                                 
+                <img style={{width:'25%',height:'272px'}} src={require('../public/images/icons/pic/Arbitration.png')}/>
+                </SmallPic_Right>                                              
+                </StepBox>                                                                                                
 
-                <Style_02 style={{left:'39.6%', position: 'absolute', top: '6352px'}}> CL Token</Style_02>
-                <img style={{left:'16%',position:'absolute',top:'6584px',width:'1360px',height:'780px'}} src={require('../public/images/icons/pic/Group120.png')} />
-
+                <BlueBox>
+                <compensate_color>
+                <div>.</div>                                               
+                </compensate_color>                                                
+                <Section_3>                                              
+                    <Style_05 > Cryptolancer Ecosystem </Style_05>
+                </Section_3>
+                <Ball>
+                     <img style={{width:'80%',height:'1000.9px'}} src={require('../public/images/icons/pic/Group125.png')} />                                              
+                </Ball>                                                                                         
+                </BlueBox>                                                                    
                 
-                <img style={{right:'1%',position:'absolute',top:'7550px',width:'120%',height:'2310px',backgroundimage:'linear-gradient(91deg, #2b80f8, #accefd 38%, #1b76f7)'}} src={require('../public/images/icons/pic/Path124.png')} />
-                <Style_05 style={{left:'27%', position: 'absolute', top: '7839px'}}> Team </Style_05>
-                <img style={{left:'10%',position:'absolute',top:'8073px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Frank.png')} />
-                <Style_05 style={{left:'0%', position: 'absolute', top: '8456px'}}> Frank Tasi </Style_05>
-                <Biography style={{left:'9%', position: 'absolute', top: '8550px'}}>FRISMO co-founder & CTO Medium writer </Biography>
-                <Biography style={{left:'9%', position: 'absolute', top: '8650px'}}>Computer Science B.S. </Biography>
-                <img style={{left:'37%',position:'absolute',top:'8073px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Joann.png')} /> 
-                <Style_05 style={{left:'27%', position: 'absolute', top: '8456px'}}> Joann Chang </Style_05>                                                                                             
-                <Biography style={{left:'36%', position: 'absolute', top: '8548px'}}>Computer Science M.S. </Biography> 
-                <Biography style={{left:'36%', position: 'absolute', top: '8600px'}}>Computer Science B.S. </Biography>
-                <Biography style={{left:'36%', position: 'absolute', top: '8650px'}}>Lite-on Corp. Intern </Biography>                                                                                             
-                <img style={{left:'64%',position:'absolute',top:'8073px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Jack.png')} /> 
-                <Style_05 style={{left:'54.5%', position: 'absolute', top: '8456px'}}> Jack Yu </Style_05>                                                                                             
-                <Biography style={{left:'63%', position: 'absolute', top: '8548px'}}>Computer Science M.S. </Biography> 
-                <Biography style={{left:'63%', position: 'absolute', top: '8650px'}}>Computer Science B.S </Biography>
-                <img style={{left:'10%',position:'absolute',top:'8760px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Sabrina.png')} />
-                <Style_05 style={{left:'0%', position: 'absolute', top: '9142px'}}> Sabrina Kuo </Style_05>
-                <Biography style={{left:'9%', position: 'absolute', top: '9236px'}}>FRISMO co-founder & CTO Medium writer </Biography>
-                <Biography style={{left:'9%', position: 'absolute', top: '9338px'}}>Computer Science B.S. </Biography> 
-                <img style={{left:'37%',position:'absolute',top:'8760px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Michael.png')} /> 
-                <Style_05 style={{left:'27%', position: 'absolute', top: '9142px'}}> Michael Liu </Style_05>                                                                                             
-                <Biography style={{left:'36%', position: 'absolute', top: '9236px'}}>Computer Science M.S. </Biography> 
-                <Biography style={{left:'36%', position: 'absolute', top: '9338px'}}>Electrical Engineer and
-Computer Science B.S. </Biography>
-                <img style={{left:'64%',position:'absolute',top:'8760px',width:'340px',height:'340px'}} src={require('../public/images/icons/pic/Dean.png')} /> 
-                <Style_05 style={{left:'54.5%', position: 'absolute', top: '9142px'}}> Dean Lai </Style_05>                                                                                             
-                <Biography style={{left:'63%', position: 'absolute', top: '9236px'}}>Computer Science M.S. </Biography>
-                <Biography style={{left:'63%', position: 'absolute', top: '9287px'}}>Bio-technology B.S. </Biography>
-                <Biography style={{left:'63%', position: 'absolute', top: '9338px'}}>National Center for High-Performance Computing </Biography>
+                <Section_4>                                                      
+                <Style_02 > CL Token</Style_02>
+                </Section_4> 
+                <pie>                                                       
+                <img src={require('../public/images/icons/pic/Group120.png')} />
+                </pie>                                                                                              
+                 
 
+                <TeamBox>
+                    <Section_5>
+                        <Style_05>  Team </Style_05>
+                    </Section_5>
+                    <Person_Middle>         
+                    <Person_Left>
+                    <img src={require('../public/images/icons/pic/Frank.png')} />          
+                    </Person_Left> 
+                    <img style={{width:'20%',height:'360px'}}src={require('../public/images/icons/pic/Joann.png')} />
+                    <Person_Right>
+                    <img src={require('../public/images/icons/pic/Jack.png')} />                                               
+                    </Person_Right> 
+                    </Person_Middle>
 
-          </div>
+                    <Person_Middle>         
+                    <Person_Left>
+                            <BioContext>          
+                            <Style_05 > Frank Tasi </Style_05>
+                            <Biography >● FRISMO co-founder & CTO Medium writer </Biography>                                      
+                            <Biography >● Computer Science B.S. </Biography>
+                            </BioContext>                                                                   
+                    </Person_Left> 
+                            <BioContext_Mid>          
+                            <Style_05 > Joann Chang </Style_05>
+                            <Biography >● Computer Science M.S.  </Biography>                                      
+                            <Biography >● Computer Science B.S. </Biography>
+                            <Biography >● Lite-on Corp. Intern </Biography>
+                            </BioContext_Mid> 
+                    <Person_Right>
+                            <BioContext>          
+                            <Style_05 > Jack Yu </Style_05>
+                            <Biography >● Computer Science M.S. </Biography>                                      
+                            <Biography >● Computer Science B.S. </Biography>
+                            </BioContext>                                                                             
+                    </Person_Right>                                               
+                    </Person_Middle>
+
+                    <Person_Middle>         
+                    <Person_Left>
+                    <img src={require('../public/images/icons/pic/Sabrina.png')} />          
+                    </Person_Left> 
+                    <img style={{width:'20%',height:'360px'}}src={require('../public/images/icons/pic/Michael.png')} />
+                    <Person_Right>
+                    <img src={require('../public/images/icons/pic/Dean.png')} />                                               
+                    </Person_Right> 
+                    </Person_Middle>
+
+                    <Person_Middle>         
+                    <Person_Left>
+                            <BioContext>          
+                            <Style_05 > Sabrina Kuo </Style_05>
+                            <Biography >● Computer Science M.S. </Biography>                                      
+                            <Biography >● Computer Science B.S. </Biography>
+                            </BioContext>                                                                   
+                    </Person_Left> 
+                            <BioContext_Mid_2>          
+                            <Style_05 > Michael Liu </Style_05>
+                            <Biography >● Computer Science M.S.  </Biography>                                      
+                            <Biography >● Electrical Engineer and Computer Science B.S. </Biography>
+                            </BioContext_Mid_2> 
+                    <Person_Right>
+                            <BioContext>          
+                            <Style_05 > Dean Lai </Style_05>
+                            <Biography >● Computer Science M.S. </Biography>                                      
+                            <Biography >● Bio-technology B.S. </Biography>                   
+                            </BioContext>                                                                             
+                    </Person_Right>                                               
+                    </Person_Middle>
+                </TeamBox>                                                                                                  
+          </Container>
         </Switch>
       </Router>
     );
