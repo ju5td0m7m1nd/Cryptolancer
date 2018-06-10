@@ -179,11 +179,11 @@ contract CPL {
             weights[i] = correctCount[i] * jurorToken[i];
             total_weight = total_weight + weights[i];
 
-            cpt.transferFrom(jurors[i], Owner, jurorToken[i]);
+            require(cpt.transferFrom(jurors[i], Owner, jurorToken[i]));
         }
 
         for (uint i = 0; i < jurors.length; i++){
-            cpt.transferFrom(Owner, jurors[i], total_token*weights[i]/total_weight);
+            require(cpt.transferFrom(Owner, jurors[i], total_token*weights[i]/total_weight));
         }
     }
 }
