@@ -279,6 +279,7 @@ class Form extends React.Component {
     //const ipfsPath = "QmPVTzKhBmFyKNNt8g8pdJskDmnt7WetvqCv8YpA1du27F"; //4 jurors (+account 1)
     //const ipfsPath = "QmV2DGVBZuZhL8Deg6ZJ1jPhSdfQwvzekGiyZhNepbvViV";
     const ipfsPath = this.props.match.params.ipfs; //9 jurors
+    
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
         IPFS_DATA = res.toString();
