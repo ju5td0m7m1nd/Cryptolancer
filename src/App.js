@@ -55,8 +55,8 @@ const Section_0= styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  margin-top: 200px;
+  margin-bottom: 180px;
 `;
 const Future_word= styled.div`
   width: 30%;
@@ -113,7 +113,7 @@ const StepBox= styled.div`
   margin-left:10%;
   -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
-  background-color: #dbeaff;
+  
 `;
 
 const SmallPic_Left= styled.div`
@@ -143,7 +143,7 @@ const compensate_color= styled.div`
   margin-bottom: 500px;
 `;
 const BlueBox= styled.div`
-  width: 100%;
+  width: 110%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -240,45 +240,12 @@ const Person_Right= styled.div`
   flex-direction: column;
 
 `;
-const BioContext_Left= styled.div`
-  display: flex;
-  align-items: flow-end;
-  justify-content: center;
-  flex-direction: row;
-  margin-bottom: 5px;
-`;
 
-const BioContext_Right= styled.div`
- 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  margin-bottom: 5px;
-`;
-
-const BioContext_Mid= styled.div`
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  margin-bottom: 5px;
-`;
-const BioContext_Mid_2= styled.div`
-  width: 20%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  margin-top: 20px;
-  margin-bottom: 50px;
-`;
 const Future = styled.div`
     width: 773px;
     height: 135px;
     font-family: Raleway;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
     font-style: normal;
     font-stretch: normal;
@@ -365,7 +332,7 @@ const Title_Whiteword = styled.div`
     width: 720px;
     height: 48px;
     font-family: Raleway;
-    font-size: 40px;
+    font-size: 44px;
     font-weight: 500;
     font-style: normal;
     font-stretch: normal;
@@ -486,7 +453,7 @@ class App extends Component {
                     <img style={{width:'200px',height:'55px'}}src={require('../public/images/icons/pic/WhitePageBtn.png')} />
                 </TitleBox>                                            
                 <FutureBox style={{position: 'relative'}}>
-                      <img style={{left:'1%',position: 'absolute',top:'0',zIndex:'-1'}} src={require('../public/images/icons/pic/blue_ground.png')} />                                             
+                      <img style={{left:'0',position: 'absolute',top:'0',zIndex:'-1' , width:'105%'}} src={require('../public/images/icons/pic/blue_ground.png')} />                                             
                 <Section_0>                                                   
                     <Title_Whiteword> The future of freelancing </Title_Whiteword> 
                 </Section_0>
@@ -518,10 +485,11 @@ class App extends Component {
                 </Context>                                                                                                             
                 
                 <Section_2 >
-                              
+                               
                 <Title_Blueword > HOW IT WORKS</Title_Blueword>
                 </Section_2 >                                                                        
-                <StepBox>                                                                        
+                <StepBox style={{position: 'relative'}}>
+                <img style={{right:'1%',position: 'absolute',top:'0',zIndex:'-1'}} src={require('../public/images/icons/pic/White_back.png')} />    
                 <SmallPic_Left>
                           <img  src={require('../public/images/icons/pic/Contract.png')} />
                 </SmallPic_Left>
@@ -540,11 +508,11 @@ class App extends Component {
                 <compensate_color>
                 <div>.</div>                                               
                 </compensate_color>                                                
-                <Section_3>                                              
+                <Section_3>                    
                     <Title_Whiteword > Cryptolancer Ecosystem </Title_Whiteword>
                 </Section_3>
                 <Ball>
-                     <img src={require('../public/images/icons/pic/Group125.png')} />                                              
+                     <img src={require('../public/images/icons/pic/Star_map.png')} />                                              
                 </Ball>                                                                                         
                 </BlueBox>                                                                    
                 
@@ -552,7 +520,7 @@ class App extends Component {
                 <Title_Grayword > CL Token</Title_Grayword>
                 </Section_4> 
                 <pie>                                                       
-                    <img src={require('../public/images/icons/pic/Group120.png')} />
+                    <img src={require('../public/images/icons/pic/Pie.png')} />
                 </pie>                                                                                              
                  
 
