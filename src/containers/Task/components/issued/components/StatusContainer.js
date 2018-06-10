@@ -101,7 +101,7 @@ class StatusContainer extends React.Component {
       case 1:
         return <Description>Waiting for submit</Description>;
       case 2:
-        return <ReviewForm />;
+        return <ReviewForm contract={contract} web3={web3} CPL={CPL}/>;
       case 3:
         return <Description>Text</Description>;
       case 4:

@@ -74,26 +74,34 @@ const mockData = [
 class ReviewForm extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      reviewResult: props.contract
+        ? props.contract.detailspec.map(s => ({ result: true, argument: "" }))
+        : []
+    };
   }
   render() {
+    const { contract } = this.props;
+    const { reviewResult } = this.state;
+    const { detailspec } = contract;
     return (
       <Container>
-        {mockData.map((d, key) =>
+        {detailspec.map((d, key) =>
           <Row key={key}>
             <SpecInfoWrapper>
               <Info>
                 {d.partition}%
               </Info>
               <Info>
-                {d.spec}
+                {d.text}
               </Info>
             </SpecInfoWrapper>
             <JudgementWrapper>
-              <Option>
+              <Option result={reviewResult[key].result === true}>
                 <div />
                 <h3>Accept</h3>
               </Option>
-              <Option>
+              <Option result={reviewResult[key].result === false}>
                 <div />
                 <h3>Decline</h3>
               </Option>
