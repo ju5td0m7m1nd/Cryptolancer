@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import Attachments from "./Attachments";
 
 const Container = styled.div`
   width: 100%;
@@ -9,7 +10,7 @@ const Container = styled.div`
 `;
 
 const DetailContainer = styled.div`
-  padding: 32px;
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -70,12 +71,12 @@ const Description = styled.h3`
 `;
 
 const STATUS = [
-  "Waiting Talented",
-  "Under Construction",
-  "Reviewing",
+  "Waiting for signing",
+  "Work in progress",
+  "Waiting for review",
   "Finished",
   "Denied, select jurors for abritration",
-  " Arbitration done"
+  "Arbitration done"
 ];
 
 class StatusContainer extends React.Component {
@@ -89,7 +90,7 @@ class StatusContainer extends React.Component {
         return <Description>Text</Description>;
         break;
       case 1:
-        return <Description>Waiting for submit.</Description>;
+        return <Attachments />;
       case 2:
         return <Description>Text</Description>;
       case 3:
