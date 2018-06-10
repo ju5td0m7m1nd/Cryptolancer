@@ -3,6 +3,7 @@ import styled from "styled-components";
 import StatusContainer from "./components/StatusContainer";
 import ipfs from "../../../../utils/ipfs";
 import firebase from "../../../../utils/firebase";
+import Mask from "../../../../components/Mask";
 /*
   statusId status
   0        Waiting Talented
@@ -13,40 +14,14 @@ import firebase from "../../../../utils/firebase";
   5        Arbitration done
 */
 
-const mockData = [
-  {
-    name: "Frank",
-    status: 0
-  },
-  {
-    name: "Frank",
-    status: 1
-  },
-  {
-    name: "Frank",
-    status: 2
-  },
-  {
-    name: "Frank",
-    status: 3
-  },
-  {
-    name: "Frank",
-    status: 4
-  },
-  {
-    name: "Frank",
-    status: 5
-  }
-];
-
 class Ongoing extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       validContracts: [],
       loading: true,
-      empty: true
+      empty: true,
+      mask: false
     };
   }
 
@@ -55,6 +30,9 @@ class Ongoing extends React.Component {
       await this._getAllTask();
     }
   }
+
+  _onLoading = () => this.setState({ mask: true });
+  _endLoading = () => this.setState({ mask: false });
 
   _getAllTask = async () => {
     const { CPL, web3 } = this.props;
@@ -113,13 +91,21 @@ class Ongoing extends React.Component {
     });
   };
   render() {
-    const { validContracts } = this.state;
-    const { CPL, web3 } = this.props;
-    console.log(validContracts);
+    const { validContracts, mask } = this.state;
+    const { CPL, web3, CPT } = this.props;
     return (
       <div>
+        {mask ? <Mask /> : null}
         {validContracts.map((d, key) =>
-          <StatusContainer contract={d} key={key} CPL={CPL} web3={web3} />
+          <StatusContainer
+            contract={d}
+            key={key}
+            CPL={CPL}
+            web3={web3}
+            CPT={CPT}
+            onLoading={this._onLoading}
+            endLoading={this._endLoading}
+          />
         )}
       </div>
     );

@@ -85,7 +85,7 @@ class StatusContainer extends React.Component {
     super(props);
   }
   _getDetatilBlock = () => {
-    const { contract, web3, CPL } = this.props;
+    const { contract, web3, CPL, CPT, onLoading, endLoading } = this.props;
     switch (contract.status) {
       case 0:
         return contract.contractorApplicant.map((address, key) =>
@@ -101,9 +101,18 @@ class StatusContainer extends React.Component {
       case 1:
         return <Description>Waiting for submit</Description>;
       case 2:
-        return <ReviewForm contract={contract} web3={web3} CPL={CPL}/>;
+        return (
+          <ReviewForm
+            contract={contract}
+            web3={web3}
+            CPL={CPL}
+            CPT={CPT}
+            onLoading={onLoading}
+            endLoading={endLoading}
+          />
+        );
       case 3:
-        return <Description>Text</Description>;
+        return <Description>Project done, payment transfered.</Description>;
       case 4:
         return <Description>Text</Description>;
       case 5:

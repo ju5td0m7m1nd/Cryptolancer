@@ -153,18 +153,23 @@ contract CPL {
     }));
   }
 
-  function terminateContract(address _contractOwner, address _freeLancer, string _ipfs, uint256 percent, address tokenAddress) public payable {
+  function terminateContract(address _contractOwner, address _freeLancer, string _ipfs, uint256 percent, address tokenAddress, string _newIpfs) public payable {
+
+    // Update latest ipfs 
+
     uint contractIdByContractOwner = getContractIndexByIssuer(_contractOwner, _ipfs);
-	require(_freeLancer == Contracts[_contractOwner][contractIdByContractOwner].contractor);
+    uint contractIdByFreelancer = getContractIndexByContractor(_contractOwner, _ipfs);
+  	require(_freeLancer == Contracts[_contractOwner][contractIdByContractOwner].contractor);
     require(Contracts[_contractOwner][contractIdByContractOwner].state == 1);//launch
 
-	uint256 price = Contracts[_contractOwner][contractIdByContractOwner].price;
+  	uint256 price = Contracts[_contractOwner][contractIdByContractOwner].price;
 
- 	CPT coinContract = CPT(tokenAddress);
+  	CPT coinContract = CPT(tokenAddress);
     coinContract.transferFrom(_contractOwner, _freeLancer, (price * percent / 100));
+    Contracts[_contractOwner][contractIdByContractOwner].ipfs = _newIpfs; //terminate
+	  Contracts_free[_freeLancer][contractIdByFreelancer].ipfs = _newIpfs ;
     Contracts[_contractOwner][contractIdByContractOwner].state = 2; //terminate
-	uint contractIdByFreelancer = getContractIndexByContractor(_contractOwner, _ipfs);
-	Contracts_free[_freeLancer][contractIdByFreelancer].state = 2 ;
+	  Contracts_free[_freeLancer][contractIdByFreelancer].state = 2 ;
   }
 
   function stringsEqual(string storage _a, string memory _b) internal returns (bool) {

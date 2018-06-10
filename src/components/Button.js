@@ -10,6 +10,7 @@ const Container = styled.button`
   float: right;
   outline: none;
   margin-top: 20px;
+  border: 0px;
 `;
 
 export default class Button extends React.Component {

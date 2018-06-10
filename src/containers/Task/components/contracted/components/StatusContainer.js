@@ -92,9 +92,9 @@ class StatusContainer extends React.Component {
       case 1:
         return <Attachments contract={contract} web3={web3} CPL={CPL} />;
       case 2:
-        return <Description>Text</Description>;
+        return <Description>Reviewing, please wait.</Description>;
       case 3:
-        return <Description>Text</Description>;
+        return <Description>Project done, payment transfered.</Description>;
       case 4:
         return <Description>Text</Description>;
       case 5:
