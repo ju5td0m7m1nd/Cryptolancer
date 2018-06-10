@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TaskSummary from "./TaskSummary";
 import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
+import { CPLInstance } from "../../../../utils/getContract";
 
 const Container = styled.section`
   background-color: transparent;
@@ -175,26 +176,109 @@ class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      CPL: null,
+      CPT: null,
+      web3: null,
       ipfsData: "",
       currentUser: "testUser",
+      authority: "uncapable",
+      balance: 0,
+      tokenNum: 0,
+      startToken: 0,
       name: "<test> Convert website to android and iOS application",
       description:
         "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
       detailSpec: "<test> Put it onto App store and GooglePlay.",
       disputes: [""],
       disputeLength: 0,
+      jurors: null,
+      chosenJurors: null,
+      issuer: null,
       submit: "unfinished"
+      
     };
   }
 
-  componentDidMount() {
-    this._initData();
+  async componentDidMount() {
+    const CPL = await CPLInstance();
+    //const CPT = await ; 
+    const web3 = (await getWeb3).web3;
+    web3.eth.getBalance(web3.eth.accounts[0], (err, res) => {
+      var balance = web3.toDecimal(res);
+      this.setState({balance: balance});
+    });
+    this.setState(
+      { 
+        CPL: CPL, 
+        //CPT: CPT,
+        web3: web3,
+        currentUser: web3.eth.accounts[0]
+      },
+      function() {
+        console.log("user: ", this.state.currentUser);
+        console.log("user balance: ", this.state.balance);
+      }
+    );
+    this._initData(CPL, web3);
   }
+
+  _checkAuthority = async () => {
+    const { CPL, web3, currentUser, jurors} = this.state;
+    const contractCount = web3.toDecimal(await CPL.getContractFreeCount.call(currentUser));
+    var contracts = [];
+    var cumulativeAmmount = 0;
+    console.log("currentUser: ", currentUser, " \\ contract num: ", contractCount);
+
+    // get currentUser's contracts 
+    for (let i = 0; i < contractCount; i++) {
+      var contract = await CPL.getContractFree.call(currentUser, i);
+      if(contract[1] == 2) {
+        contracts.push(contract[0]);
+      }
+    }
+    // read contract and add up cumulative ammount of contract prices
+    for (let i=0; i<contracts.length; i++) {
+      ipfs.files.cat(contracts[i], function(err, res) {
+        if (!err) {
+          const IPFS_DATA = res.toString();
+          const content = JSON.parse(IPFS_DATA);
+          cumulativeAmmount = cumulativeAmmount + content.budget; // "budget" should be altered to actual amount of payment
+        } else {
+          console.error("cat error", res);
+        }
+      });
+    }
+    if (cumulativeAmmount > this.state.budget) {
+      this.setState({
+        authority: "capable"
+      },
+      function() {
+        console.log("authority: ", this.state.authority);
+      });
+    }
+    
+    // check if the user has already voted
+    for (let i=0; i<jurors.length; i++) {
+      if(currentUser === jurors[i].juror) {
+        this.setState({
+          submit: "finish"
+        },
+        function() {
+          console.log("user has already voted!");
+        });
+      }
+    }
+  }
+
 
   _initData = () => {
     let content = "";
     let thisPtr = this;
-    const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const ipfsPath = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const ipfsPath = "Qmc7QVumD1dJqNUy7SuEwckP5GKJ5JN4yWZz9dzWZeVJNf";
+    //const ipfsPath = "QmPVTzKhBmFyKNNt8g8pdJskDmnt7WetvqCv8YpA1du27F"; //4 jurors (+account 1)
+    //const ipfsPath = "QmV2DGVBZuZhL8Deg6ZJ1jPhSdfQwvzekGiyZhNepbvViV";
+    const ipfsPath = this.props.match.params.ipfs; //9 jurors
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
         IPFS_DATA = res.toString();
@@ -203,19 +287,37 @@ class Form extends React.Component {
         for (var i = 0; i < content.arguments.length; i++) {
           content.arguments[i]["dec"] = "agree";
         }
+        var startToken = 0;
+        if (content.jurors == null ){
+          content.jurors = [];
+        }
+        if (content.jurors.length!=0){
+          startToken = content.jurors[content.jurors.length-1].startToken+content.jurors[content.jurors.length-1].tokenNum;
+        } 
         thisPtr.setState({
           ipfsData: content,
           name: content.name,
+          startToken: startToken,
           description: content.requiredSkills,
           detailSpec: content.spec,
           disputes: content.arguments,
-          disputeLength: content.arguments.length
+          disputeLength: content.arguments.length,
+          jurors: content.jurors,
+          issuer: content.issuer
+        },
+        function() {
+          console.log("jurors: ", thisPtr.state.jurors);
+          console.log("start token: ", thisPtr.state.startToken);
+          console.log("issuer: ", this.state.issuer);
         });
+      thisPtr._checkAuthority();
       } else {
-        alert("ipfs download error");
         console.error("cat error", res);
+        alert("cat error");
       }
+
     });
+
   };
 
   _autoGrow = e => {
@@ -237,53 +339,199 @@ class Form extends React.Component {
     });
   };
 
-  _handleChange = (e, type) => this.setState({ [type]: e.target.value });
-
-  _submit = async () => {
-    //edit polling condition
-    var newArray = this.state.disputes;
-    console.log(this.state.disputes);
-    for (var i = 0; i < this.state.disputes.length; i++) {
-      if (this.state.disputes[i]["dec"] == "agree") {
-        if (newArray[i]["voteYes"] == null) {
-          newArray[i]["voteYes"] = new Array();
-        } else {
-          newArray[i]["voteYes"] = Array.from(newArray[i]["voteYes"]);
-        }
-        newArray[i]["voteYes"].push(this.state.currentUser);
-      } else {
-        if (newArray[i]["voteNo"] == null) {
-          newArray[i]["voteNo"] = new Array();
-        } else {
-          newArray[i]["voteNo"] = Array.from(newArray[i]["voteNo"]);
-        }
-        newArray[i]["voteNo"].push(this.state.currentUser);
-      }
-    }
-    this.setState(
-      {
-        disputes: newArray,
-        submit: "finish"
-      },
-      function() {
-        console.log(this.state.disputes);
-      }
-    );
-
-    //upload IPFS
-
+  _updateIPFS = (finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum) => {
     var content = this.state.ipfsData;
-    console.log("ipfsData arguments: ", this.state.ipfsData.arguments);
-    console.log("disputes: ", this.state.disputes);
-    content.arguments = this.state.disputes;
-
+    content.jurors = this.state.jurors;
+    content.finalResult = finalResult;
+    content.chosenJurors = chosenJurors;
+    content.jurorCorrectNum = jurorCorrectNum;
+    content.chosenRandNum = chosenRandNum;
     const buffer = Buffer.from(JSON.stringify(content), "utf8"); // text string to Buffer
-    await ipfs.add(buffer, (err, ipfsHash) => {
+    ipfs.add(buffer, (err, ipfsHash) => {
       const fileAddress = `https://ipfs.io/ipfs/${ipfsHash[0].hash}`;
-      // alert(fileAddress);
-
-      // TODO add to contract
+      console.log(fileAddress);
     });
+  };
+
+  _judge = () => {
+    const { CPL, web3, jurors, disputes } = this.state;
+      const chosenJurorNum = 3; //choose 3 jurors
+      var candidates = JSON.parse(JSON.stringify(jurors));;
+      var chosenJurors = [];
+      var chosenResults = []; //[numOfJurors(3)][numOfProblems]
+      var jurorTokenNum = [];
+      var chosenRandNum = [];
+       //[numOfProblems]
+      console.log("enough jurors!")
+      for (let i=0; i<chosenJurorNum; i++) { 
+        var totalTokenFromJurors = 0;
+        for (let j=0; j<candidates.length; j++) {
+          totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
+        }
+        //TODO: call random function from smart contract
+        //var chosenNum = CPL.getRandNum(totalTokenFromJurors)
+        //(test: 5, 45 , 85 are chosen)
+        var chosenNum = i*40+5;
+        var addUpToken = candidates[0].tokenNum;
+        var nextCandidate = 1;
+        var decArray = [];
+        
+        while (addUpToken <= chosenNum) {
+          addUpToken = addUpToken + candidates[nextCandidate++].tokenNum;
+        }
+        var chosenPos = chosenNum - (addUpToken-candidates[nextCandidate-1].tokenNum);
+        chosenPos = candidates[nextCandidate-1].startToken + chosenPos;
+        chosenRandNum.push(chosenPos);
+
+        chosenJurors.push(candidates[nextCandidate-1].juror);
+        for(let j=0; j<disputes.length; j++) {
+          if (candidates[nextCandidate-1].voteCondition[j] == "agree") {
+            decArray.push(1);
+          }else {
+            decArray.push(0);
+          }
+        }
+        jurorTokenNum.push(candidates[nextCandidate-1].tokenNum);
+        chosenResults.push(decArray);
+        candidates.splice(nextCandidate-1, 1);
+      }
+      var finalResult = [];
+      var jurorCorrectNum = [];
+      
+      for (let i=0; i<chosenJurorNum; i++) {
+        jurorCorrectNum.push(0);
+      }
+      //get final voting result
+      for(let i=0; i<disputes.length; i++) {
+        var decTmp = 0;
+        for(let j=0; j<chosenJurorNum; j++) {
+          decTmp += chosenResults[j][i]
+        }
+        if (decTmp > chosenJurorNum/2){
+          finalResult.push("agree");
+        }else {
+          finalResult.push("disagree");
+        }
+        // tell if juror chose the right side
+        for(let j=0; j<chosenJurorNum; j++) {
+          if(finalResult[i]=="agree" && chosenResults[j][i]==1){
+            jurorCorrectNum[j] += 1;
+          } else if(finalResult[i]=="disagree" && chosenResults[j][i]==0) {
+            jurorCorrectNum[j] += 1;
+          }
+        }
+
+      }
+      console.log("juror token: ", jurorTokenNum);
+      console.log("chosen position: ", chosenRandNum);
+      //TODO: terminate smart contract (props)
+
+      return [finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum];
+  };
+
+  _handleChange = (e) => {
+    this.setState({ tokenNum: e.target.value });
+  };
+
+  _setContract = async (newIPFS) => {
+    const { CPL, web3 } = this.state;
+    var issuer = this.state.issuer; // set by state
+    var oldIPFS = "Qmf6ui8UQ6HovgdxMn2BbnWKUSDVuX5j4oSqGU69Fp3CyP"; //num = 2
+    //var newIPFS = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+    //const contractIdx = web3.toDecimal(await CPL.getContractIndexByIssuer.call(issuer, ipfs));
+    //console.log("contractIdx: ", contractIdx);
+    
+    //var response = await CPL.getContract.call(issuer, 2);
+    //console.log("origin ipfs: ", response[0]);
+    await CPL.updateContractFromApplicant.call(oldIPFS, newIPFS, issuer);
+    var response = await CPL.getContract.call(issuer, 2);
+    console.log("new ipfs: ", response[0]);
+    
+  }
+
+
+  _submit = () => {
+    //check eth(->TODO: token) num
+    if (this.state.tokenNum <= this.state.balance && this.state.tokenNum > 0) {
+      //transfer eth(->TODO: token) to account 2 (should be edit to our account)
+      const { currentUser, web3, tokenNum, CPL } = this.state;
+      const receiver = "0x8f7ae24bab0a52b3112e9c4e1d15063aca6a120a";
+      web3.eth.sendTransaction({from:currentUser, to:receiver, value: tokenNum}, (err, res) => {
+        console.log("token sent! ", res);
+      });
+
+      //edit polling condition
+      var choices = [];
+      var tmpArray = {};
+
+      for (var i = 0; i < this.state.disputes.length; i++) {
+        if (this.state.disputes[i]["dec"] == "agree") {
+          choices.push("agree");
+        }
+        else {
+          choices.push("disagree");
+        }
+      }
+      var newArray = this.state.jurors;
+      if (newArray.length == 0) {
+        newArray = new Array();
+      }
+
+      tmpArray["juror"] = this.state.currentUser;
+      tmpArray["tokenNum"] = this.state.tokenNum;
+      tmpArray["voteCondition"] = choices;
+
+      newArray.push(tmpArray);
+
+      this.setState(
+        {
+          jurors: newArray,
+          submit: "finish"
+        },
+        function() {
+          console.log(this.state.jurors);
+        }
+      );
+
+      // check if there are already enough jurors
+      const numOfJurors = this.state.jurors.length;
+      var result = [];
+      if (numOfJurors >= 10) {  //enough jurors
+        result = this._judge();
+        // console.log("final result: ", result[0]);
+        // console.log("chosen jurors: ", result[1]);
+        // console.log("chosenCorrectNum: ", result[2]);
+        // console.log("juror token Num: ", result[3]);
+        // console.log("chosen rand Num", result[4]);
+
+
+        //TODO: CPL transfer token and commission to jurors
+        //CPL.transfer_blah_(result[1], result[2], result[3])
+
+        //TODO: Terminate Contract
+
+      }
+
+      // check if token is less than balance and greater than 0
+      console.log("tokenNum: ", this.state.tokenNum);
+      console.log("balance: ", this.state.balance);
+      
+      //upload IPFS
+      this._updateIPFS(result[0], result[1], result[2], result[3], result[4]);
+
+      //TODO: add IPFS to contract(props)
+      //get contract owner
+      var ipfs = "Qmf6ui8UQ6HovgdxMn2BbnWKUSDVuX5j4oSqGU69Fp3CyP"; // get by state
+      var newIpfs = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
+      //get contract (owner, ipfs)
+      this._setContract(newIpfs);
+
+      //TODO: transfer token to our address
+
+    }
+    else {
+      alert("token should be greater than 0 and less than balance");
+    }
   };
   render() {
     return (
@@ -368,12 +616,15 @@ class Form extends React.Component {
         </Block>
         <Title>Attachment</Title>
         <Block />
+        Token: <input type='text' value={this.state.tokenNum} onChange={this._handleChange} />
         <SubmitBtn
           onClick={this._submit}
-          disabled={this.state.submit === "finish"}
+          disabled={this.state.submit === "finish" }
+          //disabled={this.state.submit === "finish" || this.state.authority === "uncapable"}
         >
           Apply
         </SubmitBtn>
+        
       </Container>
     );
   }
