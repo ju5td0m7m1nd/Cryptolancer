@@ -16,7 +16,7 @@ const Wrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
   flex-direction: column;
   height: 80%;
   position: relative;
@@ -77,7 +77,8 @@ class Browse extends React.Component {
     this.state = {
       search: "",
       validContracts: [],
-      loading: true
+      loading: true,
+      empty: true
     };
   }
   async componentDidMount() {
@@ -135,7 +136,9 @@ class Browse extends React.Component {
         }
       });
     });
-    this.setState({ loading: true });
+    this.setState({
+      loading: ipfss.length > 0 ? true : false
+    });
   };
   _handleChange = (e, type) => this.setState({ [type]: e.target.value });
   _create = () => {
@@ -165,6 +168,7 @@ class Browse extends React.Component {
               key={contract.ipfs}
             />
           )}
+          {validContracts.length < 1 ? <p>目前沒有待執行的專案</p> : null}
         </Wrapper>
       </Container>
     );

@@ -9,8 +9,8 @@ import {
 } from "react-router-dom";
 import Create from "./components/create";
 import Browse from "./components/browse";
-import Ongoing from "./components/ongoing";
-import History from "./components/history";
+import Issued from "./components/issued";
+import Contracted from "./components/contracted";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
 import { CPLInstance } from "../../utils/getContract";
@@ -63,9 +63,18 @@ class Task extends React.Component {
             path={`/dashboard/task/create`}
             component={() => <Create CPL={CPL} web3={web3} />}
           />
-          <Route path={`/dashboard/task/ongoing`} component={Ongoing} />
-          <Route path={`/dashboard/task/history`} component={History} />
-          <Route path="/dashboard/task/browse/:ipfs" component={Detail} />
+          <Route
+            path={`/dashboard/task/issued`}
+            component={() => <Issued CPL={CPL} web3={web3} />}
+          />
+          <Route
+            path={`/dashboard/task/contracted`}
+            component={() => <Contracted CPL={CPL} web3={web3} />}
+          />
+          <Route
+            path="/dashboard/task/browse/:ipfs"
+            component={() => <Detail CPL={CPL} web3={web3} />}
+          />
         </Switch>
       </Container>
     );
