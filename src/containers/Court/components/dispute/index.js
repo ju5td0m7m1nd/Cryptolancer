@@ -179,7 +179,9 @@ class Form extends React.Component {
       CPL: null,
       CPT: null,
       web3: null,
+      ipfs: this.props.match.params.ipfs,
       ipfsData: "",
+      contractIdx: 0,
       currentUser: "testUser",
       authority: "uncapable",
       balance: 0,
@@ -278,7 +280,7 @@ class Form extends React.Component {
     //const ipfsPath = "Qmc7QVumD1dJqNUy7SuEwckP5GKJ5JN4yWZz9dzWZeVJNf";
     //const ipfsPath = "QmPVTzKhBmFyKNNt8g8pdJskDmnt7WetvqCv8YpA1du27F"; //4 jurors (+account 1)
     //const ipfsPath = "QmV2DGVBZuZhL8Deg6ZJ1jPhSdfQwvzekGiyZhNepbvViV";
-    const ipfsPath = this.props.match.params.ipfs; //9 jurors
+    var ipfsPath = this.state.ipfs;
     
     ipfs.files.cat(ipfsPath, function(err, res) {
       if (!err) {
@@ -296,6 +298,7 @@ class Form extends React.Component {
           startToken = content.jurors[content.jurors.length-1].startToken+content.jurors[content.jurors.length-1].tokenNum;
         } 
         thisPtr.setState({
+          ipfs: thisPtr.props.match.params.ipfs,
           ipfsData: content,
           name: content.name,
           startToken: startToken,
@@ -307,18 +310,18 @@ class Form extends React.Component {
           issuer: content.issuer
         },
         function() {
-          console.log("jurors: ", thisPtr.state.jurors);
-          console.log("start token: ", thisPtr.state.startToken);
-          console.log("issuer: ", this.state.issuer);
+          console.log("props ipfs: ", thisPtr.state.ipfs);
+
         });
       thisPtr._checkAuthority();
+      thisPtr._getContractIdx();
       } else {
         console.error("cat error", res);
         alert("cat error");
       }
 
     });
-
+    
   };
 
   _autoGrow = e => {
@@ -433,30 +436,52 @@ class Form extends React.Component {
   _handleChange = (e) => {
     this.setState({ tokenNum: e.target.value });
   };
+  _getContractIdx = async () => {
+    const { CPL, web3, issuer } = this.state;
+    //const ipfs = this.props.match.params.ipfs;
+    const ipfs = "QmS3D5ktXxPzDmQbN8pSrvoorgjeBuP8HGC3HU3WYHd3R2"; //3 (props)
+    var contractIdx = web3.toDecimal(await CPL.getContractIndexByIssuer.call(issuer, ipfs));
+    this.setState(
+      {
+        contractIdx: contractIdx
+      },
+      function() {
+        console.log("contract idx: ", this.state.contractIdx);
+      }
+    );
+  };
+
+  _renewContract = async () => {
+    const { CPL, web3, issuer, contractIdx } = this.state;
+    var response = await CPL.getContract.call(issuer, contractIdx);
+    this.setState(
+      {
+        ipfs: response[0]
+      },
+      function() {
+        console.log("contract ipfs: ", this.state.ipfs);
+      }
+    );
+  }
 
   _setContract = async (newIPFS) => {
     const { CPL, web3 } = this.state;
     var issuer = this.state.issuer; // set by state
+    //var oldIPFS = this.state.ipfs;
     var oldIPFS = "Qmf6ui8UQ6HovgdxMn2BbnWKUSDVuX5j4oSqGU69Fp3CyP"; //num = 2
-    //var newIPFS = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
-    //const contractIdx = web3.toDecimal(await CPL.getContractIndexByIssuer.call(issuer, ipfs));
-    //console.log("contractIdx: ", contractIdx);
     
-    //var response = await CPL.getContract.call(issuer, 2);
-    //console.log("origin ipfs: ", response[0]);
-    await CPL.updateContractFromApplicant.call(oldIPFS, newIPFS, issuer);
-    var response = await CPL.getContract.call(issuer, 2);
-    console.log("new ipfs: ", response[0]);
-    
-  }
+    await CPL.updateContractFromApplicant(oldIPFS, newIPFS, issuer, {from: web3.eth.accounts[0]});
+
+  };
 
 
-  _submit = () => {
+  _submit = async() => {
+    await this._renewContract();
     //check eth(->TODO: token) num
     if (this.state.tokenNum <= this.state.balance && this.state.tokenNum > 0) {
       //transfer eth(->TODO: token) to account 2 (should be edit to our account)
       const { currentUser, web3, tokenNum, CPL } = this.state;
-      const receiver = "0x8f7ae24bab0a52b3112e9c4e1d15063aca6a120a";
+      const receiver = "0x5a2f1b178f0B4565f67bfd9E5DAC37dfbb9Cd86c";
       web3.eth.sendTransaction({from:currentUser, to:receiver, value: tokenNum}, (err, res) => {
         console.log("token sent! ", res);
       });
@@ -473,7 +498,11 @@ class Form extends React.Component {
           choices.push("disagree");
         }
       }
-      var newArray = this.state.jurors;
+
+      
+
+      await this._initData(); //renew ipfs data
+      var newArray = this.state.jurors; 
       if (newArray.length == 0) {
         newArray = new Array();
       }
@@ -506,11 +535,13 @@ class Form extends React.Component {
         // console.log("chosen rand Num", result[4]);
 
 
-        //TODO: CPL transfer token and commission to jurors
+        //TODO: CPL.terminateContract
         //CPL.transfer_blah_(result[1], result[2], result[3])
 
-        //TODO: Terminate Contract
-
+      }
+      else {
+        //TODO: updateIPFS
+        //TODO: setContract
       }
 
       // check if token is less than balance and greater than 0

@@ -46,15 +46,15 @@ contract StandardToken is Token {
   //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
   //Replace the if with this one instead.
   //if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
-  if (balances[msg.sender] >= _value && _value > 0) {
+    if (balances[msg.sender] >= _value && _value > 0) {
       balances[msg.sender] -= _value;
       balances[_to] += _value;
-      Transfer(msg.sender, _to, _value);
+      emit Transfer(msg.sender, _to, _value);
                   return true;
-  } else { return false; }
-                                                                                                          }
+    } else { return false; }
+  }
 
-function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
       //same as above. Replace this line with the following if you want to protect against wrapping uints.
       //if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
       //if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
@@ -62,7 +62,7 @@ function transferFrom(address _from, address _to, uint256 _value) returns (bool 
           balances[_to] += _value;
           balances[_from] -= _value;
           //allowed[_from][msg.sender] -= _value;
-          Transfer(_from, _to, _value);
+          emit Transfer(_from, _to, _value);
           return true;
       } else { return false; }
     }
@@ -73,7 +73,7 @@ function transferFrom(address _from, address _to, uint256 _value) returns (bool 
 
     function approve(address _spender, uint256 _value) returns (bool success) {
       allowed[msg.sender][_spender] = _value;
-      Approval(msg.sender, _spender, _value);
+      emit Approval(msg.sender, _spender, _value);
       return true;
     }
 
@@ -114,7 +114,7 @@ contract CPT is StandardToken {
 
     //make sure this function name matches the contract name above. So if you're token is called TutorialToken, make sure the //contract name above is also TutorialToken instead of ERC20Token
 
-    function CPT() {
+    function CPT(){
       balances[msg.sender] = 100000;               // Give the creator all initial tokens (100000 for example)
       totalSupply = 100000;                        // Update total supply (100000 for example)
       name = "CryptolancerToken";                                   // Set the name for display purposes
@@ -124,11 +124,11 @@ contract CPT is StandardToken {
                                                                                                                   /* Approves and then calls the receiving contract */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
       allowed[msg.sender][_spender] = _value;
-      Approval(msg.sender, _spender, _value);
+      emit Approval(msg.sender, _spender, _value);
                                                                                                                     //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a contract in here just for this.
     //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
     //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
-    if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
+    if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
       return true;
     }
 }
