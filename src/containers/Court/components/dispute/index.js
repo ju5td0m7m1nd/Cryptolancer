@@ -373,8 +373,7 @@ class Form extends React.Component {
 
   _getRandNum = async (range) => {
     const { CPL, web3 } = this.state;
-    range = parseInt(range, 10);
-    console.log("==========in");
+    //range = parseInt(range, 10);
     var tmp = await CPL.randomGen.call(0, range);
     console.log("========== tmp: ", tmp);
     var randNum =  web3.toDecimal(await CPL.randomGen.call(0, range, 1234, {from: web3.eth.accounts[0]}));
@@ -382,83 +381,85 @@ class Form extends React.Component {
     return randNum;
   }
 
-  _judge = () => {
-    const { CPL, web3, jurors, disputes } = this.state;
-    const chosenJurorNum = 3; //choose 3 jurors
-    var candidates = JSON.parse(JSON.stringify(jurors));;
-    var chosenJurors = [];
-    var chosenResults = []; //[numOfJurors(3)][numOfProblems]
-    var jurorTokenNum = [];
-    var chosenRandNum = [];
-       //[numOfProblems]
-    console.log("enough jurors!")
-    for (let i=0; i<chosenJurorNum; i++) { 
-        var totalTokenFromJurors = 0;
-        for (let j=0; j<candidates.length; j++) {
-          totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
+  _judge =  () => {
+    return new Promise(async (resolve, reject) => {
+      const { CPL, web3, jurors, disputes } = this.state;
+      const chosenJurorNum = 3; //choose 3 jurors
+      var candidates = JSON.parse(JSON.stringify(jurors));;
+      var chosenJurors = [];
+      var chosenResults = []; //[numOfJurors(3)][numOfProblems]
+      var jurorTokenNum = [];
+      var chosenRandNum = [];
+         //[numOfProblems]
+      console.log("enough jurors!")
+      for (let i=0; i<chosenJurorNum; i++) { 
+          var totalTokenFromJurors = 0;
+          for (let j=0; j<candidates.length; j++) {
+            totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
+          }
+          //TODO: call random function from smart contract
+          console.log("-- total token: ", totalTokenFromJurors);
+          var chosenNum =  web3.toDecimal(await CPL.randomGen.call(0, totalTokenFromJurors, totalTokenFromJurors, {from: web3.eth.accounts[0]}));
+          
+          //(test: 5, 45 , 85 are chosen)
+          //var chosenNum = i*40+5;
+          console.log("======== chosenNum: ", chosenNum);
+          var addUpToken = candidates[0].tokenNum;
+          var nextCandidate = 1;
+          var decArray = [];
+          
+          while (addUpToken <= chosenNum) {
+            addUpToken = addUpToken + candidates[nextCandidate++].tokenNum;
+          }
+          var chosenPos = chosenNum - (addUpToken-candidates[nextCandidate-1].tokenNum);
+          chosenPos = candidates[nextCandidate-1].startToken + chosenPos;
+          chosenRandNum.push(chosenPos);
+  
+          chosenJurors.push(candidates[nextCandidate-1].juror);
+          for(let j=0; j<disputes.length; j++) {
+            if (candidates[nextCandidate-1].voteCondition[j] == "agree") {
+              decArray.push(1);
+            }else {
+              decArray.push(0);
+            }
+          }
+          jurorTokenNum.push(candidates[nextCandidate-1].tokenNum);
+          chosenResults.push(decArray);
+          candidates.splice(nextCandidate-1, 1);
         }
-        //TODO: call random function from smart contract
-        console.log("-- total token: ", totalTokenFromJurors);
-        //var chosenNum = this._getRandNum(totalTokenFromJurors);
+        var finalResult = [];
+        var jurorCorrectNum = [];
         
-        //(test: 5, 45 , 85 are chosen)
-        var chosenNum = i*40+5;
-        console.log("======== chosenNum: ", chosenNum);
-        var addUpToken = candidates[0].tokenNum;
-        var nextCandidate = 1;
-        var decArray = [];
-        
-        while (addUpToken <= chosenNum) {
-          addUpToken = addUpToken + candidates[nextCandidate++].tokenNum;
+        for (let i=0; i<chosenJurorNum; i++) {
+          jurorCorrectNum.push(0);
         }
-        var chosenPos = chosenNum - (addUpToken-candidates[nextCandidate-1].tokenNum);
-        chosenPos = candidates[nextCandidate-1].startToken + chosenPos;
-        chosenRandNum.push(chosenPos);
-
-        chosenJurors.push(candidates[nextCandidate-1].juror);
-        for(let j=0; j<disputes.length; j++) {
-          if (candidates[nextCandidate-1].voteCondition[j] == "agree") {
-            decArray.push(1);
+        //get final voting result
+        for(let i=0; i<disputes.length; i++) {
+          var decTmp = 0;
+          for(let j=0; j<chosenJurorNum; j++) {
+            decTmp += chosenResults[j][i]
+          }
+          if (decTmp > chosenJurorNum/2){
+            finalResult.push("agree");
           }else {
-            decArray.push(0);
+            finalResult.push("disagree");
           }
-        }
-        jurorTokenNum.push(candidates[nextCandidate-1].tokenNum);
-        chosenResults.push(decArray);
-        candidates.splice(nextCandidate-1, 1);
-      }
-      var finalResult = [];
-      var jurorCorrectNum = [];
-      
-      for (let i=0; i<chosenJurorNum; i++) {
-        jurorCorrectNum.push(0);
-      }
-      //get final voting result
-      for(let i=0; i<disputes.length; i++) {
-        var decTmp = 0;
-        for(let j=0; j<chosenJurorNum; j++) {
-          decTmp += chosenResults[j][i]
-        }
-        if (decTmp > chosenJurorNum/2){
-          finalResult.push("agree");
-        }else {
-          finalResult.push("disagree");
-        }
-        // tell if juror chose the right side
-        for(let j=0; j<chosenJurorNum; j++) {
-          if(finalResult[i]=="agree" && chosenResults[j][i]==1){
-            jurorCorrectNum[j] += 1;
-          } else if(finalResult[i]=="disagree" && chosenResults[j][i]==0) {
-            jurorCorrectNum[j] += 1;
+          // tell if juror chose the right side
+          for(let j=0; j<chosenJurorNum; j++) {
+            if(finalResult[i]=="agree" && chosenResults[j][i]==1){
+              jurorCorrectNum[j] += 1;
+            } else if(finalResult[i]=="disagree" && chosenResults[j][i]==0) {
+              jurorCorrectNum[j] += 1;
+            }
           }
+  
         }
-
-      }
-      console.log("juror token: ", jurorTokenNum);
-      console.log("chosen position: ", chosenRandNum);
-      //TODO: terminate smart contract (props)
-
-      return [finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum];
+        console.log("juror token: ", jurorTokenNum);
+        console.log("chosen position: ", chosenRandNum);
+        
+        resolve([finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum]);
+    })
+   
   };
 
   _handleChange = (e) => {    
@@ -467,7 +468,7 @@ class Form extends React.Component {
   _getContractIdx = async () => {
     const { CPL, web3, issuer } = this.state;
     //const ipfs = this.props.match.params.ipfs;
-    const ipfs = "QmS3D5ktXxPzDmQbN8pSrvoorgjeBuP8HGC3HU3WYHd3R2"; //3 (props)
+    const ipfs = "QmVCVzdZ91jMRVjmfqS5Lt1ySHzU6XTZ8LMeuw6RgFLURf"; //2 (props)
     var contractIdx = web3.toDecimal(await CPL.getContractIndexByIssuer.call(issuer, ipfs));
     this.setState(
       {
@@ -504,7 +505,8 @@ class Form extends React.Component {
 
 
   _submit = async() => {
-    await this._renewContract();
+    //await this._renewContract();
+
     //check eth(->TODO: token) num
     if (this.state.tokenNum <= this.state.balance && this.state.tokenNum > 0) {
       //transfer eth(->TODO: token) to account 2 (should be edit to our account)
@@ -528,7 +530,6 @@ class Form extends React.Component {
         }
       }
 
-      
       if(this.state.ipfs != this.props.match.params.ipfs){
         
         //await this._initData(); //renew ipfs data
@@ -559,14 +560,21 @@ class Form extends React.Component {
       // check if there are already enough jurors
       const numOfJurors = this.state.jurors.length;
       if (numOfJurors >= 10) {  //enough jurors
-        result = this._judge(); 
-        // console.log("final result: ", result[0]);
-        // console.log("chosen jurors: ", result[1]);
-        // console.log("chosenCorrectNum: ", result[2]);
-        // console.log("juror token Num: ", result[3]);
-        // console.log("chosen rand Num", result[4]);
+        const { web3, CPL } = this.state;
+        result = await this._judge(); 
+        console.log("final result: ", result[0]);
+        console.log("chosen jurors: ", result[1]);
+        console.log("chosenCorrectNum: ", result[2]);
+        console.log("juror token Num: ", result[3]);
+        console.log("chosen rand Num", result[4]);
         var newIPFS = await this._updateIPFS(result[0], result[1], result[2], result[3], result[4]);
-        console.log("pppppppppp", newIPFS);
+        const jurors =  ["0x557dc6627301A42325B3Ae5756C3d8646B9905aF", "0x5a2f1b178f0B4565f67bfd9E5DAC37dfbb9Cd86c", "0xEe0874Eb385c09BA49C69590B5043D253c6FA9aE"]
+        const jurorsCorrectNum = [2, 2, 0];
+        const jurorsToken = [80, 70, 90];
+        await CPL.winnerReward(jurors, jurorsCorrectNum, jurorsToken, this.state.CPT, {from: web3.eth.accounts[0]});
+
+
+
         //TODO: CPL.terminateContract
         //TODO: CPL.transfer_blah_(result[1], result[2], result[3])
       }
@@ -682,7 +690,10 @@ class Form extends React.Component {
         </Block>
         <Title>Attachment</Title>
         <Block />
-        Token: <input type='number' value={this.state.tokenNum} onChange={this._handleChange} />
+        <Title>Token</Title>
+        <Block>
+        <input type='number' value={this.state.tokenNum} onChange={this._handleChange} />
+        </Block>
         <SubmitBtn
           onClick={this._submit}
           disabled={this.state.submit === "finish" }
