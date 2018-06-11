@@ -213,9 +213,16 @@ class Form extends React.Component {
               contract: this.state.contract.concat(data),
               startToken:
                 data.jurorApplicant.length > 0
-                  ? data.jurorApplicant[data.jurorApplicant.length - 1]
-                      .startToken +
-                    data.jurorApplicant[data.jurorApplicant.length - 1].tokenNum
+                  ? parseInt(
+                      data.jurorApplicant[data.jurorApplicant.length - 1]
+                        .startToken,
+                      10
+                    ) +
+                    parseInt(
+                      data.jurorApplicant[data.jurorApplicant.length - 1]
+                        .tokenNum,
+                      10
+                    )
                   : 0,
               loading: false,
               judgements: data.disputes.map(d => ({
@@ -241,7 +248,13 @@ class Form extends React.Component {
     );
     var contracts = [];
     var cumulativeAmmount = 0;
-
+    if (
+      contract[0].issuer === currentUser ||
+      contract[0].contractor === currentUser
+    ) {
+      alert("You can't arbitrate your own arguments!");
+      window.location.href = "/dashboard/court/browse";
+    }
     // get currentUser's contracts
     for (let i = 0; i < contractCount; i++) {
       var c = await CPL.getContractFree.call(currentUser, i);
@@ -295,23 +308,25 @@ class Form extends React.Component {
     return randNum;
   };
 
-  _judge = () => {
+  _judge = jurorApplicant => {
     return new Promise(async (resolve, reject) => {
-      const { CPL, web3, jurors, disputes, issuer, freelancer } = this.state;
+      const { CPL, web3 } = this.props;
+      const { contract } = this.state;
+
       const chosenJurorNum = 3; //choose 3 jurors
-      var candidates = JSON.parse(JSON.stringify(jurors));
+      const { disputes } = contract[0];
+      // clone array
+      var candidates = jurorApplicant.slice(0);
       var chosenJurors = [];
       var chosenResults = []; //[numOfJurors(3)][numOfProblems]
       var jurorTokenNum = [];
       var chosenRandNum = [];
-      var loserSide = 0;
-      //[numOfProblems]
-      console.log("enough jurors!");
+
       for (let i = 0; i < chosenJurorNum; i++) {
-        var totalTokenFromJurors = 0;
-        for (let j = 0; j < candidates.length; j++) {
-          totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
-        }
+        let totalTokenFromJurors = 0;
+        candidates.forEach(
+          j => (totalTokenFromJurors += parseInt(j.tokenNum, 0))
+        );
         // call random function from smart contract
         var chosenNum = web3.toDecimal(
           await CPL.randomGen.call(
@@ -321,24 +336,27 @@ class Form extends React.Component {
             { from: web3.eth.accounts[0] }
           )
         );
-        var addUpToken = candidates[0].tokenNum;
+        var addUpToken = parseInt(candidates[0].tokenNum, 10);
         var nextCandidate = 1;
         var decArray = [];
 
         while (addUpToken <= chosenNum) {
-          addUpToken = addUpToken + candidates[nextCandidate++].tokenNum;
+          addUpToken =
+            addUpToken + parseInt(candidates[nextCandidate++].tokenNum);
         }
         var chosenPos =
-          chosenNum - (addUpToken - candidates[nextCandidate - 1].tokenNum);
-        chosenPos = candidates[nextCandidate - 1].startToken + chosenPos;
+          chosenNum -
+          (addUpToken - parseInt(candidates[nextCandidate - 1].tokenNum));
+        chosenPos =
+          parseInt(candidates[nextCandidate - 1].startToken) + chosenPos;
         chosenRandNum.push(chosenPos);
 
-        chosenJurors.push(candidates[nextCandidate - 1].juror);
+        chosenJurors.push(candidates[nextCandidate - 1].address);
         for (let j = 0; j < disputes.length; j++) {
-          if (candidates[nextCandidate - 1].voteCondition[j] == "agree") {
-            decArray.push(1);
+          if (candidates[nextCandidate - 1].judgements[j].judgement) {
+            decArray.push(true);
           } else {
-            decArray.push(0);
+            decArray.push(false);
           }
         }
         jurorTokenNum.push(candidates[nextCandidate - 1].tokenNum);
@@ -362,7 +380,6 @@ class Form extends React.Component {
         } else {
           finalResult.push(0);
         }
-        loserSide += 1;
         // tell if juror chose the right side
         for (let j = 0; j < chosenJurorNum; j++) {
           if (finalResult[i] == chosenResults[j][i]) {
@@ -370,7 +387,11 @@ class Form extends React.Component {
           }
         }
       }
-      if (loserSide != 0) {
+      const loser = finalResult.reduce((pre, cur) => {
+        return pre + cur;
+      }, 0);
+      let loserSide;
+      if (loser != 0) {
         //freelancer addr
         loserSide = "freelancer";
       } else {
@@ -378,36 +399,19 @@ class Form extends React.Component {
         loserSide = "issuer";
       }
 
-      resolve([
+      resolve({
         finalResult,
         chosenJurors,
         jurorCorrectNum,
         jurorTokenNum,
         chosenRandNum,
         loserSide
-      ]);
+      });
     });
   };
 
   _handleChange = e => {
     this.setState({ tokenNum: e.target.value });
-  };
-
-  _getContractIdx = async () => {
-    const { CPL, web3, issuer } = this.state;
-    //const ipfs = this.props.match.params.ipfs;
-    const ipfs = "QmVCVzdZ91jMRVjmfqS5Lt1ySHzU6XTZ8LMeuw6RgFLURf"; //2 (props)
-    var contractIdx = web3.toDecimal(
-      await CPL.getContractIndexByIssuer.call(issuer, ipfs)
-    );
-    this.setState(
-      {
-        contractIdx: contractIdx
-      },
-      function() {
-        console.log("contract idx: ", this.state.contractIdx);
-      }
-    );
   };
 
   _submit = async () => {
@@ -423,30 +427,23 @@ class Form extends React.Component {
       };
       const jurorApplicant = contract[0].jurorApplicant.concat(payload);
 
-      if (jurorApplicant >= 5) {
-        // result = await this._judge();
-        // var newIPFS = await this._updateIPFS(
-        //   result[0],
-        //   result[1],
-        //   result[2],
-        //   result[3],
-        //   result[4]
-        // );
-        // const jurors = [
-        //   "0x557dc6627301A42325B3Ae5756C3d8646B9905aF",
-        //   "0x5a2f1b178f0B4565f67bfd9E5DAC37dfbb9Cd86c",
-        //   "0xEe0874Eb385c09BA49C69590B5043D253c6FA9aE"
-        // ];
-        // const jurorsCorrectNum = [2, 2, 0];
-        // const jurorsToken = [80, 70, 90];
-        // await CPL.winnerReward(
-        //   jurors,
-        //   jurorsCorrectNum,
-        //   jurorsToken,
-        //   this.state.CPT,
-        //   { from: web3.eth.accounts[0] }
-        // );
-        // //TODO: CPL.terminateContract
+      if (jurorApplicant.length >= 5) {
+        this._onLoading();
+        const result = await this._judge(jurorApplicant);
+        const newIPFSData = Object.assign(
+          {},
+          contract[0],
+          {
+            selectedNumber: result.chosenRandNum,
+            jurors: result.chosenJurors,
+            finalResult: result.finalResult,
+            jurorApplicant
+          },
+          { status: parseInt(contract[0].status) + 1 }
+        );
+        console.log(newIPFSData);
+        const newIPFS = await createIPFS(newIPFSData);
+        console.log(newIPFS);
       } else {
         this._onLoading();
         const newIPFSData = Object.assign({}, contract[0], { jurorApplicant });
@@ -465,7 +462,7 @@ class Form extends React.Component {
         this.setState({ isVoted: true });
       }
     } else {
-      alert("token should be greater than 0 and less than balance");
+      alert("Balance not enough");
     }
   };
 
