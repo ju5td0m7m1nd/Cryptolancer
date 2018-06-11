@@ -197,6 +197,7 @@ class Form extends React.Component {
       jurors: null,
       chosenJurors: null,
       issuer: null,
+      freelancer: null,
       submit: "unfinished"
       
     };
@@ -309,11 +310,11 @@ class Form extends React.Component {
           disputes: content.arguments,
           disputeLength: content.arguments.length,
           jurors: content.jurors,
-          issuer: content.issuer
+          issuer: content.issuer, 
+          freelancer: content.freelancer
         },
         function() {
           console.log("props ipfs: ", thisPtr.state.ipfs);
-
         });
       thisPtr._checkAuthority();
       thisPtr._getContractIdx();
@@ -383,13 +384,14 @@ class Form extends React.Component {
 
   _judge =  () => {
     return new Promise(async (resolve, reject) => {
-      const { CPL, web3, jurors, disputes } = this.state;
+      const { CPL, web3, jurors, disputes, issuer, freelancer} = this.state;
       const chosenJurorNum = 3; //choose 3 jurors
       var candidates = JSON.parse(JSON.stringify(jurors));;
       var chosenJurors = [];
       var chosenResults = []; //[numOfJurors(3)][numOfProblems]
       var jurorTokenNum = [];
       var chosenRandNum = [];
+      var loserSide = 0;
          //[numOfProblems]
       console.log("enough jurors!")
       for (let i=0; i<chosenJurorNum; i++) { 
@@ -397,13 +399,8 @@ class Form extends React.Component {
           for (let j=0; j<candidates.length; j++) {
             totalTokenFromJurors = totalTokenFromJurors + candidates[j].tokenNum;
           }
-          //TODO: call random function from smart contract
-          console.log("-- total token: ", totalTokenFromJurors);
+          // call random function from smart contract
           var chosenNum =  web3.toDecimal(await CPL.randomGen.call(0, totalTokenFromJurors, totalTokenFromJurors, {from: web3.eth.accounts[0]}));
-          
-          //(test: 5, 45 , 85 are chosen)
-          //var chosenNum = i*40+5;
-          console.log("======== chosenNum: ", chosenNum);
           var addUpToken = candidates[0].tokenNum;
           var nextCandidate = 1;
           var decArray = [];
@@ -440,24 +437,28 @@ class Form extends React.Component {
             decTmp += chosenResults[j][i]
           }
           if (decTmp > chosenJurorNum/2){
-            finalResult.push("agree");
+            finalResult.push(1);
           }else {
-            finalResult.push("disagree");
+            finalResult.push(0);
           }
+          loserSide += 1;
           // tell if juror chose the right side
           for(let j=0; j<chosenJurorNum; j++) {
-            if(finalResult[i]=="agree" && chosenResults[j][i]==1){
-              jurorCorrectNum[j] += 1;
-            } else if(finalResult[i]=="disagree" && chosenResults[j][i]==0) {
+            if(finalResult[i]==chosenResults[j][i]){
               jurorCorrectNum[j] += 1;
             }
           }
-  
         }
-        console.log("juror token: ", jurorTokenNum);
-        console.log("chosen position: ", chosenRandNum);
-        
-        resolve([finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum]);
+        if (loserSide != 0) {
+          //freelancer addr
+          loserSide = "freelancer";
+        }
+        else {
+          //issuer addr
+          loserSide = "issuer";
+        }
+
+        resolve([finalResult, chosenJurors, jurorCorrectNum, jurorTokenNum, chosenRandNum, loserSide]);
     })
    
   };
@@ -465,6 +466,7 @@ class Form extends React.Component {
   _handleChange = (e) => {    
     this.setState({ tokenNum: e.target.value });
   };
+
   _getContractIdx = async () => {
     const { CPL, web3, issuer } = this.state;
     //const ipfs = this.props.match.params.ipfs;
@@ -509,13 +511,6 @@ class Form extends React.Component {
 
     //check eth(->TODO: token) num
     if (this.state.tokenNum <= this.state.balance && this.state.tokenNum > 0) {
-      //transfer eth(->TODO: token) to account 2 (should be edit to our account)
-
-      // const { currentUser, web3, tokenNum, CPL } = this.state;
-      // const receiver = "0x5a2f1b178f0B4565f67bfd9E5DAC37dfbb9Cd86c";
-      // web3.eth.sendTransaction({from:currentUser, to:receiver, value: tokenNum}, (err, res) => {
-      //   console.log("token sent! ", res);
-      // });
 
       //edit polling condition
       var choices = [];
@@ -566,17 +561,16 @@ class Form extends React.Component {
         console.log("chosen jurors: ", result[1]);
         console.log("chosenCorrectNum: ", result[2]);
         console.log("juror token Num: ", result[3]);
-        console.log("chosen rand Num", result[4]);
+        console.log("chosen rand Num: ", result[4]);
+        console.log("loser side: ", result[5])
         var newIPFS = await this._updateIPFS(result[0], result[1], result[2], result[3], result[4]);
         const jurors =  ["0x557dc6627301A42325B3Ae5756C3d8646B9905aF", "0x5a2f1b178f0B4565f67bfd9E5DAC37dfbb9Cd86c", "0xEe0874Eb385c09BA49C69590B5043D253c6FA9aE"]
         const jurorsCorrectNum = [2, 2, 0];
         const jurorsToken = [80, 70, 90];
         await CPL.winnerReward(jurors, jurorsCorrectNum, jurorsToken, this.state.CPT, {from: web3.eth.accounts[0]});
 
-
-
         //TODO: CPL.terminateContract
-        //TODO: CPL.transfer_blah_(result[1], result[2], result[3])
+        
       }
       else {
         //TODO: updateIPFS
@@ -598,9 +592,6 @@ class Form extends React.Component {
       var newIpfs = "QmZuzn3HY7qyaomGnFHY6vc2DcBVugeKcxByv5ec8Tf7sU";
       //get contract (owner, ipfs)
       
-      
-
-      //TODO: transfer token to our address
 
     }
     else {
@@ -692,7 +683,7 @@ class Form extends React.Component {
         <Block />
         <Title>Token</Title>
         <Block>
-        <input type='number' value={this.state.tokenNum} onChange={this._handleChange} />
+          <input type='number' value={this.state.tokenNum} onChange={this._handleChange} />
         </Block>
         <SubmitBtn
           onClick={this._submit}
