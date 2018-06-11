@@ -62,7 +62,7 @@ const Center = styled.div`
 `;
 
 const Head = styled.h3`
-  font-size: 20px;
+  font-size: 1.3vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -74,7 +74,7 @@ const Head = styled.h3`
 `;
 
 const Body = styled.h3`
-  font-size: 20px;
+  font-size: 1.2vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -95,21 +95,21 @@ const Price = styled.div`
 `;
 
 const Green = styled.h3`
-  font-size: 30px;
+  font-size: 1.5vmax;
   color: #23702f;
   background-color: transparent;
   font-family: Raleway;
 `;
 
 const Pink = styled.h3`
-  font-size: 30px;
+  font-size: 1.5vmax;
   color: #ef2d56;
   background-color: transparent;
   font-family: Raleway;
 `;
 
 const Address = styled.h3`
-  font-size: 18px;
+  font-size: 1.2vmax;
   color: #4894fc;
   background-color: transparent;
   font-family: Raleway;
