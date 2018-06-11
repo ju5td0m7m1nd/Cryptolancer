@@ -38,18 +38,11 @@ class Navbar extends React.Component {
           BROWSE
         </NavItem>
         <NavItem
-          activate={section === "ongoing"}
+          activate={section === "record"}
           color={color}
-          onClick={() => route("/dashboard/court/ongoing")}
+          onClick={() => route("/dashboard/court/record")}
         >
-          ONGOING
-        </NavItem>
-        <NavItem
-          activate={section === "history"}
-          color={color}
-          onClick={() => route("/dashboard/court/history")}
-        >
-          HISTORY
+          RECORD
         </NavItem>
       </Nav>
     );

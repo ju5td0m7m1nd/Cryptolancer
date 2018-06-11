@@ -8,8 +8,7 @@ import {
   withRouter
 } from "react-router-dom";
 import Browse from "./components/browse";
-import Ongoing from "./components/ongoing";
-import History from "./components/history";
+import Record from "./components/history";
 import Dispute from "./components/dispute";
 import NavBar from "./components/NavBar";
 
@@ -30,6 +29,7 @@ class Court extends React.Component {
         <NavBar section={section} color="#D11149" route={this._route} />
         <Switch>
           <Route exact path={`/dashboard/court/browse`} component={Browse} />
+          <Route path="/dashborad/court/record" component={Record} />
           <Route path={`/dashboard/court/browse/:ipfs`} component={Dispute} />
         </Switch>
       </Container>

@@ -1,13 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 
-class History extends React.Component {
+class Record extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    return <div>Court History</div>;
+    return <div>Record</div>;
   }
 }
 
-export default History;
+export default Record;

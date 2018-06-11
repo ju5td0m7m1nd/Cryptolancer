@@ -107,12 +107,19 @@ class ReviewForm extends React.Component {
     this.setState({ reviewResult: newReviewResult });
   };
 
+  _updateArgument = (key, argument) => {
+    const newReviewResult = this.state.reviewResult;
+    newReviewResult[key] = Object.assign({}, newReviewResult, { argument });
+    this.setState({ reviewResult: newReviewResult });
+  };
+
   _submitResult = async () => {
     const { web3, CPL, contract, address, CPT } = this.props;
     const { reviewResult } = this.state;
-    const ifFailed = reviewResult.filter(r => !r.result);
-    if (ifFailed.length > 0) {
-      console.log("Failed");
+    const failedResult = reviewResult.filter(r => !r.result);
+    const ifFailed = failedResult.length > 0;
+    if (ifFailed) {
+      console.log(failedResult);
     } else {
       this.props.onLoading();
       const newPayload = Object.assign({}, contract, {
@@ -171,7 +178,10 @@ class ReviewForm extends React.Component {
             {!reviewResult[key].result
               ? <ArgumentWrapper>
                   <h4>Decline Reason</h4>
-                  <textarea defaultValue={reviewResult[key].argument} />
+                  <textarea
+                    defaultValue={reviewResult[key].argument}
+                    onChange={e => this._updateArgument(key, e.target.value)}
+                  />
                 </ArgumentWrapper>
               : null}
           </div>
