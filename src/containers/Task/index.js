@@ -14,6 +14,7 @@ import Contracted from "./components/contracted";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
 import { CPLInstance } from "../../utils/getContract";
+import { CPTInstance } from "../../utils/getContract";
 import getWeb3 from "../../utils/getWeb3";
 import ipfs from "../../utils/ipfs";
 
@@ -34,6 +35,7 @@ class Task extends React.Component {
 
   async componentDidMount() {
     const CPL = await CPLInstance();
+    const CPT = await CPTInstance();
     const web3 = (await getWeb3).web3;
     this.setState({ CPL, web3 });
   }

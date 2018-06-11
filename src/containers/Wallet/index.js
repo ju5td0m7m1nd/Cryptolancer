@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/Nav";
 import { CPLInstance } from "../../utils/getContract";
+import { CPTInstance } from "../../utils/getContract";
 import getWeb3 from "../../utils/getWeb3";
 import ipfs from "../../utils/ipfs";
 
@@ -61,7 +62,7 @@ const Center = styled.div`
 `;
 
 const Head = styled.h3`
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -69,17 +70,17 @@ const Head = styled.h3`
   text-align: left;
   color: #707070;
   margin-top: 3%;
+  margin-bottom: 1%;
 `;
 
 const Body = styled.h3`
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
   color: #707070;
   text-align: left;
-  margin-top: 1%;
 
 `;
 
@@ -132,18 +133,37 @@ class Wallet extends React.Component {
    super(props);
    this.state = {
       token: "",
-      fee: "",
-      create: "",
-      reward: "",
-      CPL: null,
+      flow:[],
+      CPT: null,
       web3: null
    };
   }
 
+
   async componentDidMount() {
-    const CPL = await CPLInstance();
+    
+    const CPT = await CPTInstance();
     const web3 = (await getWeb3).web3;
-    this.setState({ CPL, web3 });
+
+    this.setState({ CPT, web3 });
+    (async () => {
+      const response = await CPT.balanceOf(web3.eth.accounts[0])
+      console.log(response['c']);
+      this.setState({token: response['c']});
+    })()
+
+    // get transfer event  
+    let transferEvent = CPT.Transfer({}, {fromBlock: 0, toBlock: 'latest'})
+    transferEvent.get((error, logs) => {
+      // we have the logs, now print them
+      const flow=[];
+      //logs.forEach(log => console.log(log.args['_from'], log.args['_to'],log.args['_value']['c']))
+      logs.forEach(log => {flow.push(log.args) ;})
+
+      this.setState({flow});
+      console.log(this.state.flow);
+    })
+  
   }
 
   _route = path => this.props.history.push(path);
@@ -152,49 +172,34 @@ class Wallet extends React.Component {
     const { match } = this.props;
     const { section } = this.props.match.params;
     const { pathname } = this.props.location;
-    const { CPL, web3 } = this.state;
-
+    const { CPT ,web3, flow } = this.state;
     return(
       <Container>  
         <Header>
           <font color='#707070'>$ </font>
-          <Price>43500</Price>
+          <Price> {this.state.token} </Price>
           <Clt>CLT</Clt>
         </Header>
         <Navbar section={section} color="#6610f2" route={this._route} />
-        <Wrapper>
-          <Block>
-            <Green>+30000</Green>
-            <Head>Arbiration Fee</Head>
-            <Center>
-              <Body>From &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-              <Body>&nbsp; to &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-            </Center>
-          </Block>
-          <Block>
-            <Pink>+30000</Pink>
-            <Head>Create Project</Head>
-            <Center>
-              <Body>From &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-              <Body>&nbsp; to &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-            </Center>
-          </Block>
-          <Block>
-            <Green>+30000</Green>
-            <Head>Project reward</Head>
-            <Center>
-              <Body>From &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-              <Body>&nbsp; to &nbsp;</Body>
-              <Address>0x36db46d0c5a45fe0ea35419f7d1f8104980ede7d</Address>
-            </Center>
-          </Block>
 
+        <Wrapper>
+          { flow.map((item,key) =>
+              <Block>
+              {item['_to']===web3.eth.accounts[0] ?
+                <Green>+{item['_value']['c']}</Green>
+                :<Pink>-{item['_value']['c']}</Pink>
+              }
+                <Head>Transaction</Head>
+                <Center>
+                  <Body>from &nbsp;</Body>
+                  <Address>{item['_from']}</Address>
+                  <Body>&nbsp; to &nbsp;</Body>
+                  <Address>{item['_to']}</Address>
+                </Center>
+              </Block>
+          )} 
         </Wrapper>
+
       </Container>
     );
   }
