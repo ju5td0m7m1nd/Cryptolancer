@@ -85,31 +85,40 @@ contract CPL {
   }
 
   function updateContractFromApplicant(string old_ipfs, string new_ipfs, address _contractOwner)public{
-    require(msg.sender != address(0));
-    uint i = getContractIndexByIssuer(_contractOwner , old_ipfs);
-	address _freeLancer = Contracts[_contractOwner][i].contractor;
-    require(Contracts[_contractOwner][i].state == 1);//launch
+	    require(msg.sender != address(0));
+		uint i = getContractIndexByIssuer(_contractOwner , old_ipfs);
+		if (Contracts[_contractOwner][i].state == 0) {
+			Contracts[_contractOwner][i].ipfs = new_ipfs;
+		} else {
+			address _freeLancer = Contracts[_contractOwner][i].contractor;
+			require(Contracts[_contractOwner][i].state == 1);//launch
 
-	uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
+			uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
 
-	require(Contracts_free[_freeLancer][j].state == 1);
-	Contracts[_contractOwner][i].ipfs = new_ipfs;
-	Contracts_free[_freeLancer][j].ipfs = new_ipfs;
-  }
+			require(Contracts_free[_freeLancer][j].state == 1);
+			Contracts[_contractOwner][i].ipfs = new_ipfs;
+			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
+		}
 
-  function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
-    require(msg.sender != address(0));
 
-    uint i = getContractIndexByIssuer(msg.sender , old_ipfs);
-	address _freeLancer = Contracts[msg.sender][i].contractor;
-    require(Contracts[msg.sender][i].state == 1);//launch
+	}
 
-	uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
+	function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
+	    require(msg.sender != address(0));
+		 uint i = getContractIndexByIssuer(msg.sender , old_ipfs);
+		// if contract still not assigned, only update Contracts
+		if(Contracts[msg.sender][0].state == 0) {
+			Contracts[msg.sender][i].ipfs = new_ipfs;
+		} else {
+			address _freeLancer = Contracts[msg.sender][i].contractor;
+			require(Contracts[msg.sender][i].state == 1);//launch
+			uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
+			require(Contracts_free[_freeLancer][j].state == 1);
+			Contracts[msg.sender][i].ipfs = new_ipfs;
+			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
+		}
 
-	require(Contracts_free[_freeLancer][j].state == 1);
-	Contracts[msg.sender][i].ipfs = new_ipfs;
-	Contracts_free[_freeLancer][j].ipfs = new_ipfs;
-  }
+	}
 
   function updateContractFromFreelancer(string old_ipfs, string new_ipfs)public{
     require(msg.sender != address(0));
@@ -144,18 +153,23 @@ contract CPL {
     }));
   }
 
-  function terminateContract(address _contractOwner, address _freeLancer, string _ipfs, uint256 percent, address tokenAddress) public payable {
+  function terminateContract(address _contractOwner, address _freeLancer, string _ipfs, uint256 percent, address tokenAddress, string _newIpfs) public payable {
+
+    // Update latest ipfs
+
     uint contractIdByContractOwner = getContractIndexByIssuer(_contractOwner, _ipfs);
-	require(_freeLancer == Contracts[_contractOwner][contractIdByContractOwner].contractor);
+    uint contractIdByFreelancer = getContractIndexByContractor(_contractOwner, _ipfs);
+  	require(_freeLancer == Contracts[_contractOwner][contractIdByContractOwner].contractor);
     require(Contracts[_contractOwner][contractIdByContractOwner].state == 1);//launch
 
-	uint256 price = Contracts[_contractOwner][contractIdByContractOwner].price;
+  	uint256 price = Contracts[_contractOwner][contractIdByContractOwner].price;
 
- 	CPT coinContract = CPT(tokenAddress);
+  	CPT coinContract = CPT(tokenAddress);
     coinContract.transferFrom(_contractOwner, _freeLancer, (price * percent / 100));
+    Contracts[_contractOwner][contractIdByContractOwner].ipfs = _newIpfs; //terminate
+	  Contracts_free[_freeLancer][contractIdByFreelancer].ipfs = _newIpfs ;
     Contracts[_contractOwner][contractIdByContractOwner].state = 2; //terminate
-	uint contractIdByFreelancer = getContractIndexByContractor(_contractOwner, _ipfs);
-	Contracts_free[_freeLancer][contractIdByFreelancer].state = 2 ;
+	  Contracts_free[_freeLancer][contractIdByFreelancer].state = 2 ;
   }
 
   function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
@@ -182,13 +196,17 @@ contract CPL {
     return random;
   }
 
-  function winnerReward(address[] jurors, uint[] correctCount, uint[] jurorToken, CPT tokenAddress) public {
+  function winnerReward(address[] jurors, uint[] correctCount, uint[] jurorToken, CPT tokenAddress, address _loser, uint contractPrice) public {
     uint total_weight = 0;
     uint total_token = 0;
     uint[] weights;
+    uint fee = contractPrice / 10;
     CPT coinContract = CPT(tokenAddress);
 
+    require(coinContract.transferFrom(_loser, this, fee));
+
     for (uint i = 0; i < jurors.length; i++){
+        jurorToken[i] += fee / jurors.length;
         total_token += jurorToken[i];
         weights.push(correctCount[i] * jurorToken[i]);
         total_weight += weights[i];
@@ -196,7 +214,8 @@ contract CPL {
     }
 
     for (i = 0; i < jurors.length; i++){
-        require(coinContract.transferFrom(this, jurors[i], total_token*weights[i]/total_weight));
+        uint reward = total_token * weights[i] / total_weight;
+        require(coinContract.transferFrom(this, jurors[i], reward));
     }
   }
 }
