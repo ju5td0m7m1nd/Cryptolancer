@@ -96,20 +96,26 @@ class ReviewForm extends React.Component {
     super(props);
     this.state = {
       reviewResult: props.contract
-        ? props.contract.detailspec.map(s => ({ result: true, argument: "" }))
+        ? props.contract.detailspec.map((s, key) => ({
+            result: true,
+            argument: "",
+            specId: key
+          }))
         : []
     };
   }
 
   _updateResult = (key, result) => {
     const newReviewResult = this.state.reviewResult;
-    newReviewResult[key] = { result, argument: "" };
+    newReviewResult[key] = { result, argument: "", specId: key };
     this.setState({ reviewResult: newReviewResult });
   };
 
   _updateArgument = (key, argument) => {
     const newReviewResult = this.state.reviewResult;
-    newReviewResult[key] = Object.assign({}, newReviewResult, { argument });
+    newReviewResult[key] = Object.assign({}, newReviewResult[key], {
+      argument
+    });
     this.setState({ reviewResult: newReviewResult });
   };
 
@@ -119,7 +125,17 @@ class ReviewForm extends React.Component {
     const failedResult = reviewResult.filter(r => !r.result);
     const ifFailed = failedResult.length > 0;
     if (ifFailed) {
-      console.log(failedResult);
+      this.props.onLoading();
+      const newPayload = Object.assign({}, contract, {
+        disputes: failedResult,
+        status: contract.status + 2
+      });
+      const newIPFS = await createIPFS(newPayload);
+      await CPL.updateContractFromOwner(contract.ipfs, newIPFS, {
+        from: web3.eth.accounts[0]
+      });
+      this.props.endLoading();
+      window.location.reload();
     } else {
       this.props.onLoading();
       const newPayload = Object.assign({}, contract, {
@@ -137,7 +153,7 @@ class ReviewForm extends React.Component {
         { from: web3.eth.accounts[0] }
       );
       this.props.endLoading();
-      console.log("Success");
+      window.location.reload();
     }
   };
 

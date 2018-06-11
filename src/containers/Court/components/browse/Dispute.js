@@ -96,21 +96,27 @@ class Dispute extends React.Component {
   };
 
   render() {
+    const { contract } = this.props;
     return (
       <Block>
         <DisputeIconWrapper>
           <img src="/images/dispute.svg" />
-          <DisputeCount>3 disputes</DisputeCount>
+          <DisputeCount>
+            {contract.disputes.length} disputes
+          </DisputeCount>
         </DisputeIconWrapper>
         <Center>
-          <Head>Convert website to android and iOS application. </Head>
+          <Head>
+            {contract.name}
+          </Head>
           <Body>
-            We use reactjs on website, so it will be easy to convert to app if
-            you're familiar with React Native
+            {contract.description}
           </Body>
-          <Datetime>2018/05/12 - 2018/06/24</Datetime>
+          <Datetime>
+            {contract.startDate} - {contract.endDate}
+          </Datetime>
         </Center>
-        <DetailBtn onClick={() => this._routeToDetail(1)}>
+        <DetailBtn onClick={() => this._routeToDetail(contract.ipfs)}>
           More Detail >{" "}
         </DetailBtn>
       </Block>

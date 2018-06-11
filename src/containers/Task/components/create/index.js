@@ -254,8 +254,10 @@ class Form extends React.Component {
       contractor: null,
       contractorApplicant: [],
       jurorApplicant: [],
+      jurors: [],
       selectedNumber: [],
-      finalResult: []
+      finalResult: [],
+      disputes: [],
     };
 
     if (

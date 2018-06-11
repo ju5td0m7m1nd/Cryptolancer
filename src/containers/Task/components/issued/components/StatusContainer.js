@@ -114,7 +114,7 @@ class StatusContainer extends React.Component {
       case 3:
         return <Description>Project done, payment transfered.</Description>;
       case 4:
-        return <Description>Text</Description>;
+        return <Description>Waiting for jurors selection</Description>;
       case 5:
         return <Description>Text</Description>;
     }
