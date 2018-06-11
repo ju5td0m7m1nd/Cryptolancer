@@ -13,8 +13,7 @@ import Issued from "./components/issued";
 import Contracted from "./components/contracted";
 import Detail from "./components/detail";
 import Navbar from "./components/Navbar";
-import { CPLInstance } from "../../utils/getContract";
-import { CPTInstance } from "../../utils/getContract";
+import { CPLInstance, CPTInstance } from "../../utils/getContract";
 import getWeb3 from "../../utils/getWeb3";
 import ipfs from "../../utils/ipfs";
 
@@ -29,7 +28,8 @@ class Task extends React.Component {
     super(props);
     this.state = {
       CPL: null,
-      web3: null
+      web3: null,
+      CPT: null
     };
   }
 
@@ -37,7 +37,7 @@ class Task extends React.Component {
     const CPL = await CPLInstance();
     const CPT = await CPTInstance();
     const web3 = (await getWeb3).web3;
-    this.setState({ CPL, web3 });
+    this.setState({ CPL, web3, CPT });
   }
 
   _route = path => this.props.history.push(path);
@@ -46,7 +46,7 @@ class Task extends React.Component {
     const { match } = this.props;
     const { section } = this.props.match.params;
     const { pathname } = this.props.location;
-    const { CPL, web3 } = this.state;
+    const { CPL, web3, CPT } = this.state;
     const hideNavBar = pathname.indexOf("create") > -1;
 
     return (
@@ -67,7 +67,7 @@ class Task extends React.Component {
           />
           <Route
             path={`/dashboard/task/issued`}
-            component={() => <Issued CPL={CPL} web3={web3} />}
+            component={() => <Issued CPL={CPL} web3={web3} CPT={CPT} />}
           />
           <Route
             path={`/dashboard/task/contracted`}
