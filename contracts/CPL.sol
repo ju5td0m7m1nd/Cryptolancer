@@ -85,31 +85,40 @@ contract CPL {
   }
 
   function updateContractFromApplicant(string old_ipfs, string new_ipfs, address _contractOwner)public{
-    require(msg.sender != address(0));
-    uint i = getContractIndexByIssuer(_contractOwner , old_ipfs);
-	address _freeLancer = Contracts[_contractOwner][i].contractor;
-    require(Contracts[_contractOwner][i].state == 1);//launch
+	    require(msg.sender != address(0));
+		uint i = getContractIndexByIssuer(_contractOwner , old_ipfs);
+		if (Contracts[_contractOwner][i].state == 0) {
+			Contracts[_contractOwner][i].ipfs = new_ipfs;
+		} else {
+			address _freeLancer = Contracts[_contractOwner][i].contractor;
+			require(Contracts[_contractOwner][i].state == 1);//launch
 
-	uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
-
-	require(Contracts_free[_freeLancer][j].state == 1);
-	Contracts[_contractOwner][i].ipfs = new_ipfs;
-	Contracts_free[_freeLancer][j].ipfs = new_ipfs;
-  }
-
-  function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
-    require(msg.sender != address(0));
-
-    uint i = getContractIndexByIssuer(msg.sender , old_ipfs);
-	address _freeLancer = Contracts[msg.sender][i].contractor;
-    require(Contracts[msg.sender][i].state == 1);//launch
-
-	uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
-
-	require(Contracts_free[_freeLancer][j].state == 1);
-	Contracts[msg.sender][i].ipfs = new_ipfs;
-	Contracts_free[_freeLancer][j].ipfs = new_ipfs;
-  }
+			uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
+			
+			require(Contracts_free[_freeLancer][j].state == 1);
+			Contracts[_contractOwner][i].ipfs = new_ipfs;
+			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
+		}
+	  
+		
+	}
+	
+	function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
+	    require(msg.sender != address(0));
+		 uint i = getContractIndexByIssuer(msg.sender , old_ipfs);
+		// if contract still not assigned, only update Contracts
+		if(Contracts[msg.sender][0].state == 0) {
+			Contracts[msg.sender][i].ipfs = new_ipfs;
+		} else {
+			address _freeLancer = Contracts[msg.sender][i].contractor;
+			require(Contracts[msg.sender][i].state == 1);//launch
+			uint j = getContractIndexByContractor(_freeLancer, old_ipfs);
+			require(Contracts_free[_freeLancer][j].state == 1);
+			Contracts[msg.sender][i].ipfs = new_ipfs;
+			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
+		}
+	   
+	}
 
   function updateContractFromFreelancer(string old_ipfs, string new_ipfs)public{
     require(msg.sender != address(0));

@@ -87,10 +87,10 @@ class StatusContainer extends React.Component {
     const { contract, web3, CPL } = this.props;
     switch (contract.status) {
       case 0:
-        return <Description>Text</Description>;
+        return <Description>Request sent, waiting for signing.</Description>;
         break;
       case 1:
-        return <Attachments />;
+        return <Attachments contract={contract} web3={web3} CPL={CPL} />;
       case 2:
         return <Description>Text</Description>;
       case 3:

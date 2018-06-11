@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "../../../../../components/Button";
+import Mask from "../../../../../components/Mask";
 import firebase from "../../../../../utils/firebase";
 import { readIPFS, createIPFS } from "../../../../../utils/ipfs";
 const Container = styled.div`
@@ -56,6 +57,9 @@ const AcceptBtn = styled.div``;
 class Applicant extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      mask: false
+    };
   }
   componentDidMount() {
     const { address } = this.props;
@@ -69,6 +73,7 @@ class Applicant extends React.Component {
 
   _assignContractor = async () => {
     const { ipfs, address, CPL, web3 } = this.props;
+    this.setState({ mask: true });
     await CPL.assignContract(address, ipfs, { from: web3.eth.accounts[0] });
     const data = await readIPFS(ipfs);
     const newData = Object.assign({}, data, { contractor: address, status: 1 });
@@ -76,11 +81,13 @@ class Applicant extends React.Component {
     await CPL.updateContractFromOwner(ipfs, newIPFSHash, {
       from: web3.eth.accounts[0]
     });
+    window.location.reload();
   };
 
   render() {
     return (
       <Container>
+        {this.state.mask ? <Mask /> : null}
         <Profile>
           <img />
           <div style={{ width: "70%" }}>
