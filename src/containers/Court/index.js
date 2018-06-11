@@ -30,7 +30,7 @@ class Court extends React.Component {
         <NavBar section={section} color="#D11149" route={this._route} />
         <Switch>
           <Route exact path={`/dashboard/court/browse`} component={Browse} />
-          <Route path={`/dashboard/court/browse/:id`} component={Dispute} />
+          <Route path={`/dashboard/court/browse/:ipfs`} component={Dispute} />
         </Switch>
       </Container>
     );
