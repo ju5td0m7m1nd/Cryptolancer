@@ -115,8 +115,8 @@ contract CPT is StandardToken {
     //make sure this function name matches the contract name above. So if you're token is called TutorialToken, make sure the //contract name above is also TutorialToken instead of ERC20Token
 
     function CPT(){
-      balances[msg.sender] = 100000;               // Give the creator all initial tokens (100000 for example)
-      totalSupply = 100000;                        // Update total supply (100000 for example)
+      balances[msg.sender] = 10000000;               // Give the creator all initial tokens (100000 for example)
+      totalSupply = 10000000;                        // Update total supply (100000 for example)
       name = "CryptolancerToken";                                   // Set the name for display purposes
       decimals = 0;                            // Amount of decimals for display purposes
       symbol = "CPT";                               // Set the symbol for display purposes

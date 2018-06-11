@@ -54,7 +54,8 @@ contract("CPL", function(accounts) {
       accounts[1],
       "5",
       50,
-      cpt.address
+      cpt.address,
+      "6"
     );
     const response = await cpt.balanceOf.call(accounts[1]);
     console.log(response.toNumber());
