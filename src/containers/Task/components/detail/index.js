@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
-import ipfs from "../../../../utils/ipfs";
+import ipfs, { readIPFS, createIPFS } from "../../../../utils/ipfs";
+import Button from "../../../../components/Button";
 
 const Container = styled.section`
   width: 100%;
@@ -10,7 +11,7 @@ const Container = styled.section`
 
 const SectionBlock = styled.div`
   width: 100%;
-  padding: 24px;
+  padding: 24px 20% 24px 24px;
   background-color: #fff;
   border: solid 1px #707070;
   border-radius: 16px;
@@ -95,15 +96,20 @@ const DateInfo = styled.div`
   }
 `;
 
-const Spec = styled.p`
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  text-align: left;
-  color: #707070;
+const Spec = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  p {
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #707070;
+  }
 `;
 
 const BackBtn = styled.div`
@@ -116,6 +122,8 @@ const BackBtn = styled.div`
   color: #f17105;
   margin-bottom: 32px;
 `;
+
+const Apply = styled.div``;
 
 const mockData = {
   name: "Convert website to android and iOS application",
@@ -139,37 +147,48 @@ class Detail extends React.Component {
     super(props);
     this.state = {
       task: [],
-      loading: true
+      loading: true,
+      applied: false
     };
   }
-  componentDidMount() {
-    ipfs.files.cat(this.props.match.params.ipfs, (err, res) => {
-      if (!err) {
-        const IPFS_DATA = res.toString();
-        //load IPFS to web
-        const content = JSON.parse(IPFS_DATA);
-        if (content.status === 0) {
-          this.setState({
-            task: this.state.task.concat(content),
-            loading: false
-          });
-        }
-      } else {
-        console.log(err);
+  async componentDidMount() {
+    try {
+      const data = await readIPFS(this.props.match.params.ipfs);
+      if (data.status === 0) {
+        this.setState({
+          task: this.state.task.concat(data),
+          loading: false
+        });
       }
-    });
+    } catch (e) {
+      console.log(e);
+    }
   }
-  render() {
-    const {
-      name,
-      description,
-      skills,
-      budget,
-      startDate,
-      endDate,
-      spec
-    } = mockData;
+
+  _apply = async () => {
+    const { web3, CPL } = this.props;
     const { task } = this.state;
+    const newPayload = Object.assign({}, task[0], {
+      contractorApplicant: task[0].contractorApplicant.concat(
+        web3.eth.accounts[0]
+      )
+    });
+    const newIPFSHash = await createIPFS(newPayload);
+    await CPL.updateContractFromApplicant(
+      this.props.match.params.ipfs,
+      newIPFSHash,
+      task[0].issuer,
+      {
+        from: web3.eth.accounts[0],
+        gas: 3000000
+      }
+    );
+    this.setState({ applied: true });
+  };
+
+  render() {
+    const { task, applied } = this.state;
+    const { web3 } = this.props;
     return (
       <Container>
         <BackBtn
@@ -177,8 +196,12 @@ class Detail extends React.Component {
         >
           {"< Back to Browse"}
         </BackBtn>
-        {task.length > 0
-          ? <div>
+        {task.length > 0 && !applied
+          ? <div
+              style={{
+                padding: "0px 0px 32px"
+              }}
+            >
               <SectionBlock>
                 <InfoWrapper>
                   <InfoTitle>
@@ -212,16 +235,30 @@ class Detail extends React.Component {
               </SectionBlock>
               <SectionTitle>Task Requirement</SectionTitle>
               <SectionBlock>
-                <Spec>
-                  {task[0].detailspec}
-                </Spec>
-
-                {/* {spec.map((s, key) =>
-                  <Spec key={key}>{`${key + 1}. ${s}`}</Spec>
-                )} */}
+                {task[0].detailspec.map((s, key) =>
+                  <Spec key={key}>
+                    <p>{`${key + 1}. ${s.text}`}</p>
+                    <p>{`${s.partition}%`}</p>
+                  </Spec>
+                )}
               </SectionBlock>
+              {web3
+                ? web3.eth.accounts[0] !== task[0].issuer
+                  ? <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Button text="Apply" onClick={this._apply} />
+                    </div>
+                  : null
+                : null}
             </div>
           : null}
+        {applied ? <h2>Your application is under processing.</h2> : null}
       </Container>
     );
   }

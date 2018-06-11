@@ -130,6 +130,36 @@ const BackBtn = styled.div`
   cursor: pointer;
 `;
 
+const SpecContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #909090;
+  input {
+    width: 60%;
+    border: 0px;
+    padding: 8px 0px;
+    outline: none;
+    font-size: 1.2vmax;
+  }
+`;
+
+const SpecBtnWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 10%;
+`;
+const CreateSpec = styled.div`
+  color: #23702f;
+  font-size: 18px;
+`;
+const RemoveSpec = styled.div`
+  color: #ef2d56;
+  font-size: 18px;
+  margin-left: 12px;
+`;
+
 const PROGRESS = {
   basicInfo: ["name", "requiredSkills", "budget", "description"],
   timeline: ["startDate", "endDate"],
@@ -157,7 +187,12 @@ class Form extends React.Component {
       description: "",
       startDate: "",
       endDate: "",
-      detailspec: "",
+      detailspec: [
+        {
+          text: "",
+          partition: 100
+        }
+      ],
       owner: "",
       currentProgress: "basicInfo"
     };
@@ -174,6 +209,26 @@ class Form extends React.Component {
         Object.keys(PROGRESS).indexOf(this.state.currentProgress) + 1
       ]
     });
+  _createSpec = () => {
+    this.setState({
+      detailspec: this.state.detailspec.concat({ text: "", partition: 0 })
+    });
+  };
+  _handleSpecChange = (e, type, index) => {
+    const newSpec = Object.assign(this.state.detailspec[index], {
+      [type]: e.target.value
+    });
+    this.state.detailspec[index] = newSpec;
+    this.setState({ detailspec: this.state.detailspec });
+  };
+  _removeSpec = index => {
+    const { detailspec } = this.state;
+    this.setState({
+      detailspec: detailspec
+        .slice(0, index)
+        .concat(detailspec.slice(index - detailspec.length + 1))
+    });
+  };
 
   _submit = async () => {
     const {
@@ -195,10 +250,27 @@ class Form extends React.Component {
       detailspec,
       description,
       status: 0,
-      applicant: [],
+      issuer: web3.eth.accounts[0],
+      contractor: null,
+      contractorApplicant: [],
+      jurorApplicant: [],
       selectedNumber: [],
       finalResult: []
     };
+
+    if (
+      detailspec.reduce((pre, cur) => {
+        return parseInt(pre, 10) + parseInt(cur.partition, 10);
+      }, 0) !== 100
+    ) {
+      window.alert("Partition sum up must be 100");
+      return;
+    } else if (
+      Object.values(payload).filter(value => value === "").length > 0
+    ) {
+      window.alert("Missing some field");
+      return;
+    }
     const buffer = Buffer.from(JSON.stringify(payload), "utf8"); // text string to Buffer
 
     await ipfs.add(buffer, async (err, ipfsHash) => {
@@ -214,6 +286,7 @@ class Form extends React.Component {
   };
   render() {
     //const { currentProgress } = this.state;
+    const { detailspec } = this.state;
     return (
       <Container>
         <BackBtn
@@ -269,16 +342,44 @@ class Form extends React.Component {
         <Body>Task Requirement</Body>
         <Wrapper>
           {PROGRESS["taskrequirement"].map((item, key) =>
-            <InputRow key={key} style={{ display: "block" }}>
-              <Label>
-                {INPUT_NAME[item]}
-              </Label>
-
-              <Textarea
-                innerRef={c => (this.spec = c)}
-                onKeyUp={() => this._autoGrow(this.spec)}
-                onChange={e => this._handleChange(e, item)}
-              />
+            <InputRow key={key} style={{ display: "block", border: "0px" }}>
+              <InputRow
+                style={{ padding: "12px 0px", justifyContent: "flex-start" }}
+              >
+                <Label style={{ width: "60%" }}>
+                  {INPUT_NAME[item]}
+                </Label>
+                <Label style={{ width: "20%" }}>Partition</Label>
+              </InputRow>
+              {detailspec.map((spec, key) =>
+                <SpecContainer key={key}>
+                  <input
+                    onChange={e => this._handleSpecChange(e, "text", key)}
+                    defaultValue={spec.text}
+                    placeholder={"Describe your spec in detail"}
+                  />
+                  <div style={{ width: "30%" }}>
+                    <input
+                      onChange={e =>
+                        this._handleSpecChange(e, "partition", key)}
+                      value={spec.partition}
+                      placeholder={"Percentage of the budget"}
+                      type="number"
+                    />
+                    <span>%</span>
+                  </div>
+                  <SpecBtnWrapper>
+                    {key === detailspec.length - 1
+                      ? <CreateSpec onClick={this._createSpec}> + </CreateSpec>
+                      : null}
+                    {key !== 0 || detailspec.length > 1
+                      ? <RemoveSpec onClick={() => this._removeSpec(key)}>
+                          {" "}-{" "}
+                        </RemoveSpec>
+                      : null}
+                  </SpecBtnWrapper>
+                </SpecContainer>
+              )}
             </InputRow>
           )}
         </Wrapper>

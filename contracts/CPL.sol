@@ -99,8 +99,6 @@ contract CPL {
 			Contracts[_contractOwner][i].ipfs = new_ipfs;
 			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
 		}
-
-
 	}
 
 	function updateContractFromOwner(string old_ipfs, string new_ipfs )public{
@@ -117,7 +115,6 @@ contract CPL {
 			Contracts[msg.sender][i].ipfs = new_ipfs;
 			Contracts_free[_freeLancer][j].ipfs = new_ipfs;
 		}
-
 	}
 
   function updateContractFromFreelancer(string old_ipfs, string new_ipfs)public{
