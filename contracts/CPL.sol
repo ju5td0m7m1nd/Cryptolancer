@@ -196,7 +196,7 @@ contract CPL {
     return random;
   }
 
-  function winnerReward(address[] jurors, uint[] correctCount, uint[] jurorToken, CPT tokenAddress) public {
+  function winnerReward(address[] jurors, uint[] correctCount, uint[] jurorToken, address tokenAddress) public {
     uint total_weight = 0;
     uint total_token = 0;
     uint[] weights;
