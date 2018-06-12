@@ -22,7 +22,7 @@ const Block = styled.div`
 
 const DisputeInnerContainer = styled.section`
   background-color: #fff;
-  width: 100%;
+  width: 80%;
   height: 100%;
   margin-bottom: 10px;
   display: flex;
@@ -52,6 +52,7 @@ const JudgementBlock = styled.section`
   -webkit-flex: none;
   flex: none;
   width: 25%;
+  align-items: center;
   margin-left: 30px;
   margin-right: 0px;
   display: inline;
@@ -80,7 +81,7 @@ const ProjectName = styled.h2`
 `;
 
 const Label = styled.h3`
-  font-size: 1.2vmax;
+  font-size: 1.0vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -97,7 +98,7 @@ const RedLabel = styled.h3`
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
-  text-align: left;
+  text-align: center;
   color: #D11149;
   width: 100%;
   margin-top: 0.5em;
@@ -116,7 +117,7 @@ const Title = styled.h2`
 `;
 
 const Subject = styled.h2`
-  font-size: 1.2vmax;
+  font-size: 1.5vmax;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
@@ -134,7 +135,7 @@ const Spec = styled.div`
   align-items: center;
   margin-bottom: 8px;
   p {
-    font-size: 14px;
+    font-size: 1.0vmax;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
@@ -144,22 +145,10 @@ const Spec = styled.div`
   }
 `;
 
-const Back2BrowseBtn = styled.button`
+const Back2HistoryBtn = styled.button`
   font-size: 20px;
   outline: none;
   color: #d11149;
-  border: 0px;
-  background-color: transparent;
-  text-align: left;
-`;
-
-const RadioBtn = styled.button`
-  type: radio;
-  outline: none;
-  name: "";
-  value: "";
-
-  //color: #d11149;
   border: 0px;
   background-color: transparent;
   text-align: left;
@@ -227,7 +216,10 @@ class Form extends React.Component {
           "type":"hyperlink",
           "value":"https://<test>workuniverse.co"
         }
-      ]
+      ],
+      finalResult: [],
+      applyingFlag: false,
+      chosenJurorFlag: false
     };
   }
 
@@ -240,11 +232,11 @@ class Form extends React.Component {
         CPL: CPL, 
         CPT: CPT,
         web3: web3,
-        currentUser: "0xb019c765614a6c549f9958618949417c58af3401"
-        // currentUser: web3.eth.accounts[0]
+        // currentUser: "0xb019c765614a6c549f9958618949417c58af3401"
+        currentUser: web3.eth.accounts[0]
       },
       function() {
-        console.log("user: ", this.state.currentUser);
+        
       }
     );
     this._initData(CPL, web3);
@@ -262,9 +254,18 @@ class Form extends React.Component {
         content = JSON.parse(IPFS_DATA);
         var userIdx = 0
         var userDec = [];
+        var chosenJurorFlag = false;
+        var applyingFlag = false;
         for(let i=0; i<content.jurorApplicant.length; i++) {
           if(content.jurorApplicant[i].address == thisPtr.state.currentUser) {
             userIdx = i;
+            if(content.jurors !=null){
+              for(let j=0; j<content.jurors.length; j++) {
+                if(thisPtr.state.currentUser == content.jurors[j])  chosenJurorFlag = true;
+              }
+            } else {
+              applyingFlag = true;
+            }
           }
         }
         
@@ -278,10 +279,13 @@ class Form extends React.Component {
           description: content.description,
           detailSpec: content.detailspec,
           disputes: content.disputes,
-          attachments: content.attachments
+          attachments: content.attachments,
+          finalResult: content.finalResult,
+          chosenJurorFlag: chosenJurorFlag,
+          applyingFlag: applyingFlag
 
         }, function () {
-    
+          
         });
       } else {
         console.error("cat error", res);
@@ -299,11 +303,11 @@ class Form extends React.Component {
   render() {
     return (
       <Container>
-        <Back2BrowseBtn
+        <Back2HistoryBtn
           onClick={() => this.props.history.push("/dashboard/court/history")}
         >
           {" "}&lt; Back to History
-        </Back2BrowseBtn>
+        </Back2HistoryBtn>
         <Block>
           <ProjectName>
             {" "}{this.state.name}{" "}
@@ -338,8 +342,13 @@ class Form extends React.Component {
             </ArgumentBlock>
             <JudgementBlock>
               <Label>Judgement</Label>
-              <RadioBtn />
             </JudgementBlock>
+            {this.state.finalResult!=null
+            ? <JudgementBlock>
+                <Label>Final Result</Label>
+              </JudgementBlock>
+            : null
+            }
           </DisputeInnerContainer>
           <Line />
           <Label>
@@ -356,17 +365,31 @@ class Form extends React.Component {
                   </Label>
                 </ArgumentBlock>
                 <JudgementBlock>
-                  <Label>
-                    {dispute.userDec === true ? 
-                      <RedLabel>Reasonable</RedLabel>
-                      : <RedLabel>Not Convincible</RedLabel>
-                    }
-                  </Label>
+                  {dispute.userDec === true ? 
+                    <RedLabel>V</RedLabel>
+                    : <RedLabel>X</RedLabel>
+                  }
                 </JudgementBlock>
+                {this.state.finalResult != null
+                  ? this.state.finalResult[key] == 1
+                    ? <JudgementBlock>
+                        <Label>Reasonable</Label>
+                      </JudgementBlock>
+                    : <JudgementBlock>
+                        <Label>Not Convincible</Label>
+                      </JudgementBlock>
+                  : null
+                }
               </DisputeInnerContainer>
             )}
           </Label>
           <Hr />
+          {this.state.applyingFlag == false 
+            ? this.state.chosenJurorFlag == true
+              ? <RedLabel>You are chosen as the juror</RedLabel>
+              : <RedLabel>You are not chosen as the juror</RedLabel>
+            : <RedLabel>Waiting for more jurors</RedLabel>
+          }
         </Block>
         <Title>Attachment</Title>
         <Block>
@@ -379,7 +402,6 @@ class Form extends React.Component {
               : null
           )}
         </Block>
-
       </Container>
     );
   }
