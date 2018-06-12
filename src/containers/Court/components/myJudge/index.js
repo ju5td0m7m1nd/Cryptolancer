@@ -91,6 +91,18 @@ const Label = styled.h3`
   margin-top: 0.5em;
 `;
 
+const RedLabel = styled.h3`
+  font-size: 1.2vmax;
+  font-weight: 500;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: left;
+  color: #D11149;
+  width: 100%;
+  margin-top: 0.5em;
+`;
+
 const Title = styled.h2`
   font-size: 1.5vmax;
   font-weight: 500;
@@ -114,6 +126,22 @@ const Subject = styled.h2`
   margin-bottom: 25px;
   color: #303030;
   width: 100%;
+`;
+
+const Spec = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  p {
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #707070;
+  }
 `;
 
 const Back2BrowseBtn = styled.button`
@@ -185,11 +213,21 @@ class Form extends React.Component {
       name: "<test> Convert website to android and iOS application",
       description:
         "<test> We use reactjs on website so it will be easy to convert to app if you're familiar with React Native",
-      detailSpec: "<test> Put it onto App store and GooglePlay.",
+      detailSpec: [
+        {"text":"<test>","partition":"30"},
+        {"text":"<test>","partition":"60"},
+        {"text":"<test>","partition":"10"}
+      ],
       disputes: [""],
       userIdx: 0,
       userDec: null,
-      contract: null
+      contract: null,
+      attachments: [
+        {
+          "type":"hyperlink",
+          "value":"https://<test>workuniverse.co"
+        }
+      ]
     };
   }
 
@@ -238,13 +276,12 @@ class Form extends React.Component {
           userIdx: userIdx,
           name: content.name,
           description: content.description,
-          detailSpec: content.detailSpec,
+          detailSpec: content.detailspec,
           disputes: content.disputes,
+          attachments: content.attachments
 
         }, function () {
-          console.log("contract: ", this.state.contract);
-          console.log("userIdx: ", this.state.userIdx);
-          console.log("dispute: ", this.state.disputes);
+    
         });
       } else {
         console.error("cat error", res);
@@ -259,24 +296,11 @@ class Form extends React.Component {
     e.style.height = e.scrollHeight + 20 + "px";
   };
 
-  _handleOptionChange = (e, dispute) => {
-    var newArray = this.state.disputes;
-    var specID = dispute.dispute.spec_ID;
-    for (var i = 0; i < newArray.length; i++) {
-      if (newArray[i]["spec_ID"] == specID) {
-        newArray[i]["dec"] = e.target.value;
-      }
-    }
-    this.setState({ disputes: newArray }, function() {
-      console.log(this.state.disputes);
-    });
-  };
-
   render() {
     return (
       <Container>
         <Back2BrowseBtn
-          onClick={() => this.props.history.push("/dashboard/court/browse")}
+          onClick={() => this.props.history.push("/dashboard/court/history")}
         >
           {" "}&lt; Back to History
         </Back2BrowseBtn>
@@ -293,7 +317,12 @@ class Form extends React.Component {
         <Block>
           <Subject>Detail specification</Subject>
           <Label>
-            {this.state.detailSpec}
+            {this.state.detailSpec.map((s, key) =>
+              <Spec key={key}>
+                <p>{`${key + 1}. ${s.text}`}</p>
+                <p>{`${s.partition}%`}</p>
+              </Spec>
+            )}
           </Label>
           <Hr />
         </Block>
@@ -328,22 +357,10 @@ class Form extends React.Component {
                 </ArgumentBlock>
                 <JudgementBlock>
                   <Label>
-                    <input
-                      type="radio"
-                      value="agree"
-                      checked={dispute.userDec === true}
-                      style={{ marginRight: "8px" }}
-                    />
-                    Reasonable
-                  </Label>
-                  <Label>
-                    <input
-                      type="radio"
-                      value="disagree"
-                      checked={dispute.userDec === false}
-                      style={{ marginRight: "8px" }}
-                    />
-                    Not Convincible
+                    {dispute.userDec === true ? 
+                      <RedLabel>Reasonable</RedLabel>
+                      : <RedLabel>Not Convincible</RedLabel>
+                    }
                   </Label>
                 </JudgementBlock>
               </DisputeInnerContainer>
@@ -352,7 +369,16 @@ class Form extends React.Component {
           <Hr />
         </Block>
         <Title>Attachment</Title>
-        <Block />
+        <Block>
+        {this.state.attachments.map(
+          (a, key) =>
+            a.type === "hyperlink"
+              ? <a href={a.value} key={key}>
+                  {a.value}
+                </a>
+              : null
+          )}
+        </Block>
 
       </Container>
     );
