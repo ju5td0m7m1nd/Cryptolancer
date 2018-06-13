@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Browse from "./components/browse";
 import Record from "./components/history";
+import MyJudge from "./components/myJudge";
 import Dispute from "./components/dispute";
 import NavBar from "./components/NavBar";
 import { CPLInstance, CPTInstance } from "../../utils/getContract";
@@ -49,8 +50,14 @@ class Court extends React.Component {
             component={() => <Browse CPL={CPL} web3={web3} />}
           />
           <Route
-            path="/dashborad/court/record"
+            exact
+            path="/dashboard/court/record"
             component={() => <Record CPL={CPL} web3={web3} CPT={CPT} />}
+          />
+          <Route
+            path={`/dashboard/court/record/:ipfs`}
+            component={props =>
+              <MyJudge CPL={CPL} web3={web3} CPT={CPT} {...props} />}
           />
           <Route
             path={`/dashboard/court/browse/:ipfs`}
