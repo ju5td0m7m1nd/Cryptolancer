@@ -1,9 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import getWeb3 from "../../../../utils/getWeb3";
 import ipfs from "../../../../utils/ipfs";
-import { CPLInstance } from "../../../../utils/getContract";
-import { CPTInstance } from "../../../../utils/getTokenContract";
+import { withRouter } from "react-router";
 
 const Container = styled.section`
   background-color: transparent;
@@ -189,10 +187,9 @@ const Line = styled.hr`
 
 var IPFS_DATA = "";
 
-class Form extends React.Component {
+class MyJudge extends React.Component {
   constructor(props) {
     super(props);
-    console.log("props: ", props);
     this.state = {
       CPL: null,
       CPT: null,
@@ -224,9 +221,7 @@ class Form extends React.Component {
   }
 
   async componentDidMount() {
-    const CPL = await CPLInstance();
-    const CPT = await CPTInstance();
-    const web3 = (await getWeb3).web3;
+    const {CPL, CPT, web3 } = this.props;
     this.setState(
       { 
         CPL: CPL, 
@@ -304,9 +299,9 @@ class Form extends React.Component {
     return (
       <Container>
         <Back2HistoryBtn
-          onClick={() => this.props.history.push("/dashboard/court/history")}
+          onClick={() => this.props.history.push("/dashboard/court/record")}
         >
-          {" "}&lt; Back to History
+          {" "}&lt; Back to Record
         </Back2HistoryBtn>
         <Block>
           <ProjectName>
@@ -407,4 +402,4 @@ class Form extends React.Component {
   }
 }
 
-export default Form;
+export default withRouter(MyJudge);
